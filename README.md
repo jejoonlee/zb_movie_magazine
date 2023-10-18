@@ -64,7 +64,10 @@
 
 ## ERD
 
+![image-20231018214938982](README.assets/image-20231018214938982.png)
 
+- Movie 테이블의 poster_path 같은 경우
+  - `https://image.tmdb.org/t/p/original/[poster_path]` 를 사용하면 이미지를 가지고 올 수 있다
 
 
 
@@ -87,12 +90,12 @@
 #### 영화
 
 - **TMDB에 저장되어 있는 영화를 업데이트 하기** (ADMIN만 할 수 있음)
-  - 스케줄러 사용
+  - 스케줄러 사용 (Overwrite)
 - **GET 영화 목록 검색** (ADMIN, EDITOR, USER) - 리뷰 작성할 때 필요
   - ***Elastic Search 사용***
-  - 영화 제목
-  - 영화 감독
-  - 영화 배우
+  - 영화 제목 (한글 가능)
+  - 영화 감독 (영어만)
+  - 영화 배우 (영어만)
 
 
 
