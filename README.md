@@ -21,8 +21,6 @@
 
 
 
-
-
 ## Who?
 
 #### 이용자는 크게 두 분류로 나뉜다
@@ -48,6 +46,30 @@
 
 
 
+## 사용 기술
+
+- Java 8 (JDK 1.8)
+- Gradle
+- Spring Boot : 2.7.16
+- MySQL
+- Spring Security
+- Swagger
+- ElasticSearch (예정)
+- WebSocket (예정)
+- OAuth (예정)
+
+
+
+
+
+## ERD
+
+
+
+
+
+
+
 ## 구현할 기능
 
 
@@ -55,32 +77,50 @@
 #### 인증 (모두)
 
 - **POST 회원가입**
+  - 회원가입을 할 때에 EDITOR 또는 USER 권한을 정한다
   - *추후에 간편 로그인 추가 (gmail? kakao? naver?)* 
 - **POST 로그인**
+  - 해당 어플리케이션은 로그인을 리뷰를 볼 수 있다
+
+
+
+#### 영화
+
+- **TMDB에 저장되어 있는 영화를 업데이트 하기** (ADMIN만 할 수 있음)
+  - 스케줄러 사용
+- **GET 영화 목록 검색** (ADMIN, EDITOR, USER) - 리뷰 작성할 때 필요
+  - ***Elastic Search 사용***
+  - 영화 제목
+  - 영화 감독
+  - 영화 배우
 
 
 
 #### 영화 리뷰
 
 - **POST 작성** (EDITOR)
+  - 리뷰 제목 / 영화 이름 / 영화 점수(Editor가 주는 점수) / 리뷰 내용
 - **GET 키워드 검색** (ADMIN, EDITOR, USER)
+  - ***Elastic Search 사용***
+  - 리뷰 제목
+  - 리뷰를 쓴 유저
+  - 영화
 - **GET 리뷰 상세 내용** (ADMIN, EDITOR, USER)
 - **PUT 리뷰 수정** (EDITOR)
 - **DELETE 리뷰 삭제** (ADMIN, EDITOR)
+  - ADMIN은 비적정한 리뷰를 삭제할 수 있다
+- **GET 리뷰 좋아요** (EDITOR, USER)
+- **GET 인기 리뷰** (EDITOR, USER)
+  - 리뷰 좋아요를 토대로, 탑 10 리뷰 목록 보여주기
 
 
 
 #### 리뷰 댓글
+
+> Websocket을 사용해서 댓글이 달리면 리뷰를 쓴 EDITOR가 알람을 받을 수 있도록 한다
 
 - **POST 작성** (ADMIN, EDITOR, USER)
 - **GET 해당 리뷰에 대한 댓글 일기** (ADMIN, EDITOR, USER)
   - 시간 순으로 내림차순으로 (최신이 제일 위에)
 - **PUT 댓글 수정** (ADMIN, EDITOR, USER)
 - **DELETE 리뷰 삭제** (ADMIN, EDITOR, USER)
-
-
-
-#### 영화 업데이트
-
-- TMDB에 저장되어 있는 영화를 업데이트 하기 (ADMIN만 할 수 있음)
-  - *이 기능을 수동으로, URL을 통해서 기능을 구현할지 or 스케줄러를 사용할지?*
