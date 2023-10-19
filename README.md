@@ -64,10 +64,13 @@
 
 ## ERD
 
-![image-20231018214938982](README.assets/image-20231018214938982.png)
+![image-20231019200425149](README.assets/image-20231019200425149.png)
 
 - Movie 테이블의 poster_path 같은 경우
   - `https://image.tmdb.org/t/p/original/[poster_path]` 를 사용하면 이미지를 가지고 올 수 있다
+- 고민해봐야 하는 것
+  - 인물을 넣을 것인가? (이미 영화 데이터도 많은데, 캐스트까지 넣으면 너무 많아질 것 같다)
+
 
 
 
@@ -90,7 +93,14 @@
 #### 영화
 
 - **TMDB에 저장되어 있는 영화를 업데이트 하기** (ADMIN만 할 수 있음)
+  - 처음에는 모든 영화를 DB에 저장하기
+    - 811188개
+  
+  - 이후에 업데이트 할 때에는 Now Playing만 업데이트 하기
+    - 2023-09-06 ~ 2023-10-24 : 2173개
+  
   - 스케줄러 사용 (Overwrite)
+  
 - **GET 영화 목록 검색** (ADMIN, EDITOR, USER) - 리뷰 작성할 때 필요
   - ***Elastic Search 사용***
   - 영화 제목 (한글 가능)
@@ -126,4 +136,4 @@
 - **GET 해당 리뷰에 대한 댓글 일기** (ADMIN, EDITOR, USER)
   - 시간 순으로 내림차순으로 (최신이 제일 위에)
 - **PUT 댓글 수정** (ADMIN, EDITOR, USER)
-- **DELETE 리뷰 삭제** (ADMIN, EDITOR, USER)
+- **DELETE 리뷰 댓글 삭제** (ADMIN, EDITOR, USER)
