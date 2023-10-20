@@ -7,7 +7,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class MovMagApplication {
 
 	public static void main(String[] args) {
-		System.out.println("test");
 		SpringApplication.run(MovMagApplication.class, args);
 	}
 
