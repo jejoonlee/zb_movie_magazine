@@ -1,5 +1,11 @@
 # 영화 리뷰 (MOVMAG)
 
+
+
+[개발 진행 계획](https://www.notion.so/b57220fd5c6446239bdb9c5eb7296a30?pvs=4)
+
+
+
 <img src="README.assets/DlWnWaUX4AAd8rQ.jpg" alt="DlWnWaUX4AAd8rQ" style="zoom:33%;" />
 
 
