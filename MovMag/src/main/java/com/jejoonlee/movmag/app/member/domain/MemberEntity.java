@@ -30,7 +30,7 @@ public class MemberEntity implements UserDetails {
     @Column(name="username", nullable = false, length = 50)
     private String username;
 
-    @Column(name="password", nullable = false, length = 50)
+    @Column(name="password", nullable = false, length = 1000)
     private String password;
 
     @Column(name="phone_number", nullable = false, length = 20)

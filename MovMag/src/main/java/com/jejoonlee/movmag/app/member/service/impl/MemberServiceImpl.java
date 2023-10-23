@@ -2,6 +2,7 @@ package com.jejoonlee.movmag.app.member.service.impl;
 
 import com.jejoonlee.movmag.app.member.domain.MemberEntity;
 import com.jejoonlee.movmag.app.member.dto.MemberDto;
+import com.jejoonlee.movmag.app.member.dto.MemberLogin;
 import com.jejoonlee.movmag.app.member.dto.MemberRegister;
 import com.jejoonlee.movmag.app.member.repository.MemberRepository;
 import com.jejoonlee.movmag.app.member.service.MemberService;
@@ -39,6 +40,19 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
 
         // response 객체를 만들기어서 return하기
         return MemberRegister.Response.fromDto(MemberDto.fromEntity(memberEntity));
+    }
+
+    @Override
+    public MemberLogin.Response login(MemberLogin.Request request) {
+
+        MemberEntity user = memberRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("유저가 존재하지 않습니다"));
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new RuntimeException("비밀번호가 일치하지 않습니다");
+        }
+
+        return MemberLogin.Response.fromDto(MemberDto.fromEntity(user));
     }
 
     @Override
