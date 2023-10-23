@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 @Builder
 public class MemberDto {
 
-    private Long memberId;
     private String email;
     private String username;
     private String password;
@@ -23,7 +22,6 @@ public class MemberDto {
 
     public static MemberDto fromEntity(MemberEntity memberEntity) {
         return MemberDto.builder()
-                .memberId(memberEntity.getMemberId())
                 .email(memberEntity.getEmail())
                 .username(memberEntity.getUsername())
                 .password(memberEntity.getPassword())

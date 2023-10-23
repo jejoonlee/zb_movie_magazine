@@ -37,6 +37,7 @@ public class MemberRegister {
         private String phoneNum;
 
         @NotBlank(message="Editor 또는 User를 입력해주세요")
+        @Pattern(regexp = "Editor|User", message = "Editor 또는 User를 입력해주세요")
         private String role;
 
         public MemberEntity toEntity() {
@@ -57,14 +58,12 @@ public class MemberRegister {
     @AllArgsConstructor
     @Builder
     public static class Response {
-        private Long memberId;
         private String email;
         private String username;
         private String role;
 
         public static Response fromDto(MemberDto memberDto){
             return Response.builder()
-                    .memberId(memberDto.getMemberId())
                     .email(memberDto.getEmail())
                     .username(memberDto.getUsername())
                     .role(memberDto.getRole())
