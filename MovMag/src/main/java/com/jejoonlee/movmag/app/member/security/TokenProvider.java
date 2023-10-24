@@ -21,15 +21,16 @@ public class TokenProvider {
 
     private final MemberServiceImpl memberServiceImpl;
     private static final String KEY_ROLES = "role";
-    private static final String MEMBER_ID = "memberId";
+    private static final String EMAIL = "email";
     private static final long VALIDATE_TIME = 1 * 60 * 60 * 1000L; // 1시간
 
     @Value("${spring.jwt.secret.key}")
     private String secretKey;
 
     // 토큰 생성 매서드
-    public String generateToken(String email, String role) {
-        Claims claims = Jwts.claims().setSubject(email);
+    public String generateToken(Long memberId, String email, String role) {
+        Claims claims = Jwts.claims().setSubject(String.valueOf(memberId));
+        claims.put(EMAIL, email);
         claims.put(KEY_ROLES, role); // key value로 저장
 
         var now = new Date();
@@ -44,11 +45,11 @@ public class TokenProvider {
     }
 
     public Authentication getAuthentication(String jwt) {
-        UserDetails userDetails = memberServiceImpl.loadUserByUsername(getEmail(jwt));
+        UserDetails userDetails = memberServiceImpl.loadUserByUsername(getMemberId(jwt));
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
-    public String getEmail(String token) {
+    public String getMemberId(String token) {
         return this.parseClaims(token).getSubject();
     }
 

@@ -45,20 +45,22 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
     @Override
     public MemberLogin.Response login(MemberLogin.Request request) {
 
-        MemberEntity user = memberRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("유저가 존재하지 않습니다"));
+        MemberDto user = (MemberDto) loadUserByUsername(request.getEmail());
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("비밀번호가 일치하지 않습니다");
         }
 
-        return MemberLogin.Response.fromDto(MemberDto.fromEntity(user));
+        return MemberLogin.Response.fromDto(user);
     }
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return this.memberRepository.findByEmail(email)
+
+        MemberEntity member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("유저가 존재하지 않습니다"));
 
+        return MemberDto.fromEntity(member);
     }
+
 }
