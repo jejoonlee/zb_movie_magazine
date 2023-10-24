@@ -2,8 +2,9 @@ package com.jejoonlee.movmag.app.member.controller;
 
 import com.jejoonlee.movmag.app.member.dto.MemberLogin;
 import com.jejoonlee.movmag.app.member.dto.MemberRegister;
+import com.jejoonlee.movmag.app.member.dto.TokenDto;
 import com.jejoonlee.movmag.app.member.security.TokenProvider;
-import com.jejoonlee.movmag.app.member.service.impl.MemberServiceImpl;
+import com.jejoonlee.movmag.app.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,7 +18,7 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 public class MemberController {
 
-    private final MemberServiceImpl memberServiceImpl;
+    private final MemberService memberService;
 
     private final TokenProvider tokenProvider;
 
@@ -25,19 +26,27 @@ public class MemberController {
     @PostMapping("/register")
     public MemberRegister.Response register(
             @RequestBody @Valid MemberRegister.Request request
-            ) {
+    ) {
 
-        return memberServiceImpl.register(request);
+        return memberService.register(request);
     }
 
     // http://localhost:8080/member/login
     @PostMapping("/login")
-    public String login(
+    public TokenDto login(
             @RequestBody  @Valid MemberLogin.Request request
     ) {
 
-        MemberLogin.Response loginInfo = memberServiceImpl.login(request);
+        MemberLogin.Response loginInfo = memberService.login(request);
 
-        return "토큰이 생성되었습니다 : Bearer " + tokenProvider.generateToken(loginInfo.getEmail(), loginInfo.getRole());
+        TokenDto token = TokenDto.builder()
+                .accessToken(tokenProvider.generateToken(
+                        loginInfo.getMemberId(),
+                        loginInfo.getEmail(),
+                        loginInfo.getRole()))
+                .tokenType("Bearer")
+                .build();
+
+        return token;
     }
 }

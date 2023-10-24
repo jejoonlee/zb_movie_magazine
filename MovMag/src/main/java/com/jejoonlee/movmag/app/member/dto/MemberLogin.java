@@ -28,11 +28,13 @@ public class MemberLogin {
     @NoArgsConstructor
     public static class Response {
 
+        private Long memberId;
         private String email;
         private String role;
 
         public static MemberLogin.Response fromDto(MemberDto memberDto) {
             return Response.builder()
+                    .memberId(memberDto.getMemberId())
                     .email(memberDto.getEmail())
                     .role(memberDto.getRole())
                     .build();
