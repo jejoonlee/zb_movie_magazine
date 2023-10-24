@@ -23,9 +23,7 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
     @Override
     public MemberRegister.Response register(MemberRegister.Request request) {
 
-        boolean memberExist = memberRepository.existsByEmail(request.getEmail());
-
-        if (memberExist) {
+        if (memberRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("입력한 이메일이 이미 존재합니다");
         }
 
