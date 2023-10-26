@@ -10,4 +10,11 @@ import lombok.*;
 public class ErrorResponse {
     private ErrorCode errorCode;
     private String errorMessage;
+
+    public static ErrorResponse getErrorCode(ErrorCode code) {
+        return ErrorResponse.builder()
+                .errorCode(code)
+                .errorMessage(code.getDescription())
+                .build();
+    }
 }
