@@ -10,6 +10,7 @@ public class MemberLogin {
     @Getter
     @Setter
     @AllArgsConstructor
+    @Builder
     public static class Request {
 
         @NotBlank(message="이메일을 입력해주세요")

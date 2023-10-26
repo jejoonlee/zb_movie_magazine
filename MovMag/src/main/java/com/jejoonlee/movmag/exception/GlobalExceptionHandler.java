@@ -3,6 +3,7 @@ package com.jejoonlee.movmag.exception;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -18,10 +19,11 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MemberException.class)
-    public ErrorResponse handleMemberException(MemberException e) {
+    public ResponseEntity<ErrorResponse> handleMemberException(MemberException e) {
         log.error("{} has occurred.", e.getErrorCode());
 
-        return new ErrorResponse(e.getErrorCode(), e.getErrorMessage());
+        return ResponseEntity.badRequest().body(
+                ErrorResponse.getErrorCode(e.getErrorCode()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -38,56 +40,50 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ErrorResponse handleDataIntegrityViolationException(DataIntegrityViolationException e) {
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
         log.error("DataIntegrityViolationException has occurred : " + e.getMessage(), e);
 
-        return new ErrorResponse(
-                ErrorCode.INVALID_REQUEST,
-                ErrorCode.INVALID_REQUEST.getDescription()
-        );
+        return ResponseEntity.badRequest().body(
+                ErrorResponse.getErrorCode(ErrorCode.INVALID_REQUEST));
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ErrorResponse handleAccessDeniedException(AccessDeniedException e) {
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException e) {
         log.error("AccessDeniedException has occurred: " + e.getMessage(), e);
 
-        return new ErrorResponse(
-                ErrorCode.USER_PERMISSION_NOT_GRANTED,
-                ErrorCode.USER_PERMISSION_NOT_GRANTED.getDescription());
+        return ResponseEntity.badRequest().body(
+                ErrorResponse.getErrorCode(ErrorCode.USER_PERMISSION_NOT_GRANTED));
     }
 
     @ExceptionHandler(NullPointerException.class)
-    public ErrorResponse handleNullPointerException(NullPointerException e) {
+    public ResponseEntity<ErrorResponse> handleNullPointerException(NullPointerException e) {
         log.error("NullPointerException has occurred : " + e.getMessage());
 
-        return new ErrorResponse(
-                ErrorCode.NO_INPUT,
-                ErrorCode.NO_INPUT.getDescription());
+        return ResponseEntity.badRequest().body(
+                ErrorResponse.getErrorCode(ErrorCode.NO_INPUT));
     }
 
     @ExceptionHandler(SignatureException.class)
-    public ErrorResponse handleSignatureException(SignatureException e) {
+    public ResponseEntity<ErrorResponse> handleSignatureException(SignatureException e) {
         log.error("SignatureException has occured : " + e.getMessage());
 
-        return new ErrorResponse(
-                ErrorCode.JWT_SHOULD_NOT_BE_TRUSTED,
-                ErrorCode.JWT_SHOULD_NOT_BE_TRUSTED.getDescription());
+        return ResponseEntity.badRequest().body(
+                ErrorResponse.getErrorCode(ErrorCode.JWT_SHOULD_NOT_BE_TRUSTED));
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleJsonParseException(HttpMessageNotReadableException e) {
+        log.error("HttpMessageNotReadableException has occured : " + e.getMessage());
+
+        return ResponseEntity.badRequest().body(
+                ErrorResponse.getErrorCode(ErrorCode.HTTP_REQUEST_BODY_ERROR));
     }
 
     @ExceptionHandler(Exception.class)
-    public ErrorResponse handleException(Exception e) {
+    public ResponseEntity<ErrorResponse> handleException(Exception e) {
         log.error("Exception has occurred: " + e.getMessage(), e);
 
-        if (e.getMessage().split(":")[0].equals("JSON parse error")) {
-            log.error(e.getMessage());
-
-            return new ErrorResponse(
-                    ErrorCode.WRONG_INPUT_REQUEST,
-                    ErrorCode.WRONG_INPUT_REQUEST.getDescription());
-        }
-
-        return new ErrorResponse(
-                ErrorCode.INTERNAL_SERVER_ERROR,
-                ErrorCode.INTERNAL_SERVER_ERROR.getDescription());
+        return ResponseEntity.internalServerError().body(
+                ErrorResponse.getErrorCode(ErrorCode.INTERNAL_SERVER_ERROR));
     }
 }

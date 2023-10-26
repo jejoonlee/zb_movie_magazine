@@ -33,8 +33,8 @@ public class TokenProvider {
         claims.put(EMAIL, email);
         claims.put(KEY_ROLES, role); // key value로 저장
 
-        var now = new Date();
-        var expiredDate = new Date(now.getTime() + VALIDATE_TIME);
+        Date now = new Date();
+        Date expiredDate = new Date(now.getTime() + VALIDATE_TIME);
 
         return Jwts.builder()
                 .setClaims(claims)
@@ -57,7 +57,7 @@ public class TokenProvider {
         // 토큰이 빈 문자열이면 false
         if (!StringUtils.hasText(token)) return false;
 
-        var claims = parseClaims(token);
+        Claims claims = parseClaims(token);
         return !claims.getExpiration().before(new Date()); //토큰 만료 시간이 현재보다 이전인지 아닌지 만료 여부 확인
     }
 

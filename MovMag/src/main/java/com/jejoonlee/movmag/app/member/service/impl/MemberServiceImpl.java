@@ -6,6 +6,8 @@ import com.jejoonlee.movmag.app.member.dto.MemberLogin;
 import com.jejoonlee.movmag.app.member.dto.MemberRegister;
 import com.jejoonlee.movmag.app.member.repository.MemberRepository;
 import com.jejoonlee.movmag.app.member.service.MemberService;
+import com.jejoonlee.movmag.exception.ErrorCode;
+import com.jejoonlee.movmag.exception.MemberException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -24,7 +26,7 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
     public MemberRegister.Response register(MemberRegister.Request request) {
 
         if (memberRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("입력한 이메일이 이미 존재합니다");
+            throw new MemberException(ErrorCode.EMAIL_EXISTS);
         }
 
         // 비밀번호 encoding 하기
@@ -46,7 +48,7 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
         MemberDto user = (MemberDto) loadUserByUsername(request.getEmail());
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("비밀번호가 일치하지 않습니다");
+            throw new MemberException(ErrorCode.PASSWORD_NOT_MATCH);
         }
 
         return MemberLogin.Response.fromDto(user);
@@ -56,7 +58,7 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
         MemberEntity member = memberRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("유저가 존재하지 않습니다"));
+                .orElseThrow(() -> new MemberException(ErrorCode.USER_NOT_FOUND));
 
         return MemberDto.fromEntity(member);
     }

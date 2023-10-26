@@ -12,9 +12,11 @@ public enum ErrorCode {
     NO_INPUT("빈칸 값이 있습니다"),
     JWT_SHOULD_NOT_BE_TRUSTED("JWT 토큰의 유효성이 확인이 안 됩니다. 다시 입력해주세요"),
     WRONG_INPUT_REQUEST("입력값을 제대로 입력하지 않았습니다. 다시 확인해주세요"),
+    HTTP_REQUEST_BODY_ERROR("HTTP body에 문제가 생겼습니다. 다시 확인해주세요"),
 
     // 유저 관련 에러 코드
     USER_NOT_FOUND("없는 유저입니다"),
+    EMAIL_EXISTS("이미 이메일이 존재합니다"),
     PASSWORD_NOT_MATCH("비밀번호가 일치하지 않습니다"),
     USER_PERMISSION_NOT_GRANTED("해당 요청에 대한 권한이 없습니다. JWT 토큰을 헤더에 추가하거나, 다른 로그인 정보로 로그인해주세요");
 
