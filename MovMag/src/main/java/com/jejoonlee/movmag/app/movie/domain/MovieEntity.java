@@ -3,6 +3,7 @@ package com.jejoonlee.movmag.app.movie.domain;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Setter
@@ -18,10 +19,9 @@ public class MovieEntity {
     @Column(name = "movie_id")
     private Long movieId;
 
-
     @Column(name = "genre")
     @Convert(converter = LongArrayConverter.class)
-    private List<Long> genreId;
+    private List<Long> genreId = new ArrayList<>();
 
     @Column(name = "title_eng")
     private String titleEng;

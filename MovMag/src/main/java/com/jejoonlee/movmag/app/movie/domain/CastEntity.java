@@ -4,6 +4,7 @@ import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity(name="cast")
@@ -15,7 +16,7 @@ public class CastEntity {
 
     @Column(name="movie_id")
     @Convert(converter = LongArrayConverter.class)
-    private List<Long> movie;
+    private List<Long> movie = new ArrayList<>();
 
     @Column(name="name_eng")
     private String nameEng;

@@ -11,7 +11,10 @@ public class GenreEntity {
     @Column(name="genre_id")
     private Long genreId;
 
-    @Column(name="name")
-    private String name;
+    @Column(name="name_eng")
+    private String nameEng;
+
+    @Column(name="name_kor")
+    private String nameKor;
 
 }
