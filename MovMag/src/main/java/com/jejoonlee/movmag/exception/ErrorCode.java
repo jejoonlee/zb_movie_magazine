@@ -21,6 +21,9 @@ public enum ErrorCode {
     USER_PERMISSION_NOT_GRANTED("해당 요청에 대한 권한이 없습니다. JWT 토큰을 헤더에 추가하거나, 다른 로그인 정보로 로그인해주세요"),
 
     // 영화 업데이트 에러 코드
+    MOVIE_NOT_FOUND("영화를 찾을 수 없습니다"),
+    CAST_NOT_FOUND("캐스트를 찾을 수 없습니다"),
+
     TMDB_SUCCESS("TMDB 관련 요청이 정상적으로 작동 되었습니다"),
     TMDB_INVALID_SERVICE("해당 서비스는 유효하지 않습니다"),
     TMDB_AUTHENTICATION_FAIL("인증 실패 : 서비스를 이용할 권한이 없습니다"),

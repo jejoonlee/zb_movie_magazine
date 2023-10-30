@@ -16,6 +16,7 @@ public class UpdateMovie {
     @Setter
     @Builder
     public static class Response {
+        private String message;
         private int movieNum;
         private int peopleNum;
     }

@@ -5,5 +5,5 @@ import org.json.simple.parser.ParseException;
 
 public interface MovieService {
 
-    UpdateMovie.Response saveAllMovies(UpdateMovie.Request request) throws ParseException;
+    UpdateMovie.Response saveAllMovies(UpdateMovie.Request request) throws ParseException, InterruptedException;
 }

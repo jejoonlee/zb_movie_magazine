@@ -22,7 +22,7 @@ public class MovieController {
     @PostMapping("/first-time")
     public UpdateMovie.Response saveAllMovie (
             @RequestBody UpdateMovie.Request request
-    ) throws ParseException {
+    ) throws ParseException, InterruptedException {
 
         return movieService.saveAllMovies(request);
     }

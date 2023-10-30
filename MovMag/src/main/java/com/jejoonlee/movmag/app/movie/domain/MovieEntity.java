@@ -2,9 +2,11 @@ package com.jejoonlee.movmag.app.movie.domain;
 
 import lombok.*;
 
-import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import javax.persistence.Column;
+import javax.persistence.Convert;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import java.util.HashSet;
 
 @Setter
 @Getter
@@ -20,8 +22,8 @@ public class MovieEntity {
     private Long movieId;
 
     @Column(name = "genre")
-    @Convert(converter = LongArrayConverter.class)
-    private List<Long> genreId = new ArrayList<>();
+    @Convert(converter = LongSetConverter.class)
+    private HashSet<Long> genreId = new HashSet<>();
 
     @Column(name = "title_eng")
     private String titleEng;
@@ -29,20 +31,20 @@ public class MovieEntity {
     @Column(name = "title_kor")
     private String titleKor;
 
-    @Column(name = "overview_eng")
+    @Column(name = "overview_eng", length = 1000)
     private String overviewEng;
 
-    @Column(name = "overview_kor")
+    @Column(name = "overview_kor", length = 1000)
     private String overviewKor;
 
-    @Column(name = "released_date")
+    @Column(name = "released_date", length = 20)
     private String releasedDate;
 
     @Column(name = "movie_score")
     private Double movieScore;
 
     @Column(name = "runtime")
-    private int runtime;
+    private Long runtime;
 
     @Column(name = "poster_path")
     private String posterPath;
