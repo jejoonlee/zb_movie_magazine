@@ -1,5 +1,7 @@
 package com.jejoonlee.movmag.app.movie.service.impl;
 
+import com.jejoonlee.movmag.app.movie.domain.GenreEntity;
+import com.jejoonlee.movmag.app.movie.dto.GenreDto;
 import com.jejoonlee.movmag.app.movie.dto.UpdateMovie;
 import com.jejoonlee.movmag.app.movie.repository.CastRepository;
 import com.jejoonlee.movmag.app.movie.repository.GenreRepository;
@@ -10,6 +12,7 @@ import com.jejoonlee.movmag.exception.MovieException;
 import com.jejoonlee.movmag.exception.TmdbError;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -19,6 +22,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -71,33 +75,92 @@ public class MovieServiceImpl implements MovieService {
         return result;
     }
 
-    @Override
-    public UpdateMovie.Response saveAllMovies(UpdateMovie.Request request) {
-
+    private JSONArray getGenre(UpdateMovie.Request request, String language) throws ParseException {
+        // 장르 업데이트 하기
         String genreURL = "https://api.themoviedb.org/3/genre/movie/list?language=";
 
-        // 장르 업데이트 하기
-        JSONObject genreResult = null;
+        JSONObject genreResult = tmdbGetResult(genreURL + language,
+                request.getApiKey());
 
-        try{
-            genreResult = tmdbGetResult(genreURL + LANG_ENG,
-                    request.getApiKey());
+        ErrorCode genreEngErrorCode = isSuccessful(genreResult);
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (!genreEngErrorCode.equals(ErrorCode.TMDB_SUCCESS)) {
+            throw new MovieException(genreEngErrorCode);
         }
 
-        if (genreResult.containsKey("status_code")) {
-            ErrorCode genreErrorCode = TmdbError.check((Long) genreResult.get("status_code"));
-            log.error(String.valueOf(genreErrorCode));
+        JSONArray genreList = (JSONArray) genreResult.get("genres");
 
-            if (genreErrorCode != ErrorCode.TMDB_SUCCESS) {
-                throw new MovieException(genreErrorCode);
+        return genreList;
+    }
+
+    private void saveGenre(JSONArray genreArrayEng, JSONArray genreArrayKor) {
+        for (int i = 0; i < genreArrayEng.size(); i ++) {
+            JSONObject genreEng = (JSONObject) genreArrayEng.get(i);
+
+            Long genreEngId = (Long) genreEng.get("id");
+            String genreNameEng = (String) genreEng.get("name");
+
+            GenreDto genreDto = GenreDto.builder()
+                    .genreId(genreEngId)
+                    .genreEng(genreNameEng)
+                    .build();
+
+            genreRepository.save(GenreDto.toEntity(genreDto));
+        }
+
+        for (int i = 0; i < genreArrayKor.size(); i++) {
+            JSONObject genreKor = (JSONObject) genreArrayKor.get(i);
+
+            Long genreKorId = (Long) genreKor.get("id");
+            String genreNameKor = (String) genreKor.get("name");
+
+            GenreDto genreDto;
+
+            if (!genreRepository.existsById(genreKorId)) {
+                genreDto = GenreDto.builder()
+                        .genreId(genreKorId)
+                        .genreKor(genreNameKor)
+                        .build();
+            } else {
+                GenreEntity genreEntity = genreRepository.findById(genreKorId)
+                        .orElseThrow(() -> new MovieException(ErrorCode.INTERNAL_SERVER_ERROR));
+
+                genreDto = GenreDto.fromEntity(genreEntity);
+                genreDto.setGenreKor(genreNameKor);
             }
+
+            genreRepository.save(GenreDto.toEntity(genreDto));
+        }
+    }
+
+
+    private static ErrorCode isSuccessful(JSONObject result) {
+
+        if (result.containsKey("status_code")) {
+            ErrorCode errorCode = TmdbError.check((Long) result.get("status_code"));
+            return errorCode;
+        } else {
+            return ErrorCode.TMDB_SUCCESS;
         }
 
+    }
 
-        // 영화 정보 페이지, 하나씩 가지고 오기 (for문으로 1부터 500)
+    @Override
+    public UpdateMovie.Response saveAllMovies(UpdateMovie.Request request) throws ParseException {
+
+        // 장르 저장하기
+        log.info("Get Genre start : {}", LocalDateTime.now());
+        JSONArray genreArrayEng = getGenre(request, LANG_ENG);
+        JSONArray genreArrayKor = getGenre(request, LANG_KOREAN);
+        log.info("Get Genre finish : {}", LocalDateTime.now());
+
+        log.info("Save Genre start : {}", LocalDateTime.now());
+        saveGenre(genreArrayEng, genreArrayKor);
+        log.info("Save Genre finish : {}", LocalDateTime.now());
+
+
+
+        // ===== 영화 정보 페이지, 하나씩 가지고 오기 (for문으로 1부터 500) =====
             // 페이지 안에 있는 영화들 순회하며 해당 Detail 페이지의 credits에서 cast 정보 가지고 오기 (그 중에 배우와 감독만)
             // Cast_id가 db에 있으면, 영화 ID만 리스트 안에 추가로 저장
             // 없으면 그대로 저장
