@@ -18,7 +18,7 @@ public class MovieController {
 
     // http://localhost:8080/movie/firstTime
     // 처음에 영화 가지고 오기 (500개, 한번만)
-    // only admin
+    // only admin (업데이트까지 다 완성되면 권한 넣기)
     @PostMapping("/first-time")
     public UpdateMovie.Response saveAllMovie (
             @RequestBody UpdateMovie.Request request

@@ -24,7 +24,9 @@ public class LongSetConverter implements AttributeConverter<HashSet<Long>, Strin
             setToString.setLength(setToString.length() - SPLIT_CHAR.length()); // Remove the trailing delimiter
         }
 
-        return setToString.toString();
+        String result = setToString.toString();
+
+        return result.trim();
     }
 
 
@@ -34,7 +36,11 @@ public class LongSetConverter implements AttributeConverter<HashSet<Long>, Strin
         String[] stringToSet = dbData.split(SPLIT_CHAR);
         HashSet<Long> set = new HashSet<>();
 
-        for (String str : stringToSet) set.add(Long.parseLong(str));
+        for (String str : stringToSet) {
+            if (!str.equals("")) {
+                set.add(Long.parseLong(str));
+            }
+        }
 
         return set;
     }

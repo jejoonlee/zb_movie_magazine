@@ -20,6 +20,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -175,7 +176,9 @@ public class MovieServiceImpl implements MovieService {
             if (!movieRepository.existsById((Long) movie.get("id"))) {
 
                 if (genreIds.size() != 0) {
-                    for (Object id : genreIds) set.add((Long) id);
+                    for (Object id : genreIds) {
+                        set.add((Long) id);
+                    }
                 } else {
                     set.add(0L);
                 }
@@ -328,6 +331,7 @@ public class MovieServiceImpl implements MovieService {
 
     }
 
+    @Async
     @Override
     public UpdateMovie.Response saveAllMovies(UpdateMovie.Request request) throws ParseException, InterruptedException {
 
@@ -347,7 +351,7 @@ public class MovieServiceImpl implements MovieService {
         // ===== 영화 정보 페이지, 하나씩 가지고 오기 (for문으로 1부터 500) =====
         String moviePopularUrl = "https://api.themoviedb.org/3/movie/popular?language=";
 
-        for (int pageNum = 1; pageNum <= 500; pageNum++) {
+        for (int pageNum = 460; pageNum <= 500; pageNum++) {
             String pg = String.format("&page=%d", pageNum);
 
             String moviePopularUrlEng = moviePopularUrl + LANG_ENG + pg;

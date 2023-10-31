@@ -22,7 +22,7 @@ public class CastEntity {
     @Column(name="cast_id")
     private Long castId;
 
-    @Column(name="movie_id")
+    @Column(name="movie_id", length = 5000)
     @Convert(converter = LongSetConverter.class)
     private HashSet<Long> movie = new HashSet<>();
 
