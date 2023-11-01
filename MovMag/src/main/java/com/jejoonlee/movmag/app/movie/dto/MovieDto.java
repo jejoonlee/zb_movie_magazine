@@ -3,7 +3,8 @@ package com.jejoonlee.movmag.app.movie.dto;
 import com.jejoonlee.movmag.app.movie.domain.MovieEntity;
 import lombok.*;
 
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -13,7 +14,7 @@ import java.util.HashSet;
 public class MovieDto {
 
     private Long movieId;
-    private HashSet<Long> genreId = new HashSet<>();
+    private Map<String, Object> genreId = new HashMap<>();
     private String titleEng;
     private String titleKor;
     private String overviewEng;

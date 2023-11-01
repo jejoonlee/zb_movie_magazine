@@ -30,5 +30,12 @@ public class MovieController {
 
     // 2달 안 최신 영화 가지고 오기 (영화 업데이트 할때마다)
     // only admin
+    @PostMapping("/newUpdate")
+    public UpdateMovie.Response updateMovie (
+            @RequestBody UpdateMovie.Request request
+    ) throws ParseException, InterruptedException {
+
+        return movieService.updateNewMovies(request);
+    }
 
 }

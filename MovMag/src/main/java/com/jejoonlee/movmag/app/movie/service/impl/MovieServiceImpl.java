@@ -28,7 +28,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.LocalDateTime;
-import java.util.HashSet;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -175,17 +175,22 @@ public class MovieServiceImpl implements MovieService {
 
             if (!movieRepository.existsById((Long) movie.get("id"))) {
 
+                ArrayList<Long> genreIdArray = new ArrayList<>();
+                Map<String, Object> genreIdMap = new HashMap<>();
+
                 if (genreIds.size() != 0) {
                     for (Object id : genreIds) {
-                        set.add((Long) id);
+                        genreIdArray.add((Long) id);
                     }
                 } else {
-                    set.add(0L);
+                    genreIdArray.add(0L);
                 }
+
+                genreIdMap.put("장르ID", genreIdArray);
 
                 MovieDto movieDto = MovieDto.builder()
                         .movieId((Long) movie.get("id"))
-                        .genreId(set)
+                        .genreId(genreIdMap)
                         .titleEng((String) movie.get("title"))
                         .overviewEng((String) movie.get("overview"))
                         .releasedDate((String) movie.get("release_date"))
@@ -202,16 +207,26 @@ public class MovieServiceImpl implements MovieService {
             JSONObject movie = (JSONObject) movieListKor.get(i);
             Long movieId = (Long) movie.get("id");
 
-            HashSet<Long> set = new HashSet<>();
-
             JSONArray genreIds = (JSONArray) movie.get("genre_ids");
 
-            for (Object id : genreIds) set.add((Long) id);
-
             if (!movieRepository.existsById(movieId)) {
+
+                ArrayList<Long> genreIdArray = new ArrayList<>();
+                Map<String, Object> genreIdMap = new HashMap<>();
+
+                if (genreIds.size() != 0) {
+                    for (Object id : genreIds) {
+                        genreIdArray.add((Long) id);
+                    }
+                } else {
+                    genreIdArray.add(0L);
+                }
+
+                genreIdMap.put("장르ID", genreIdArray);
+
                 MovieDto movieDto = MovieDto.builder()
                         .movieId((Long) movie.get("id"))
-                        .genreId(set)
+                        .genreId(genreIdMap)
                         .titleKor((String) movie.get("title"))
                         .overviewKor((String) movie.get("overview"))
                         .releasedDate((String) movie.get("release_date"))
@@ -286,13 +301,16 @@ public class MovieServiceImpl implements MovieService {
             CastDto castDto;
 
             if (!savedCast) {
-                HashSet<Long> set = new HashSet<>();
+                JSONArray movieArray = new JSONArray();
 
-                set.add(movieId);
+                movieArray.add(movieId);
+
+                JSONObject object = new JSONObject();
+                object.put("movieId", movieArray);
 
                 castDto = CastDto.builder()
                         .castId(castId)
-                        .MovieIds(set)
+                        .MovieId(object)
                         .nameEng((String) cast.get("name"))
                         .role(role)
                         .build();
@@ -308,10 +326,20 @@ public class MovieServiceImpl implements MovieService {
 
                 castDto = CastDto.fromEntity(castEntity);
 
-                HashSet<Long> set = castDto.getMovieIds();
-                set.add(movieId);
+                Map<String, Object> movieIdMap = castDto.getMovieId();
 
-                castDto.setMovieIds(set);
+                Set<Long> movieIdSet = new HashSet<>();
+
+                ArrayList<Integer> movieIdList = (ArrayList<Integer>) movieIdMap.get("movieId");
+
+                for (int id : movieIdList) movieIdSet.add((long) id);
+
+                movieIdSet.add(movieId);
+
+                movieIdMap.put("movieId", new ArrayList<>(movieIdSet));
+
+                castDto.setMovieId(movieIdMap);
+
             }
 
             castRepository.save(CastDto.toEntity(castDto));
@@ -330,33 +358,18 @@ public class MovieServiceImpl implements MovieService {
         }
 
     }
+    private int[] saveMovies(String movieUrl, int start, int movieNum, UpdateMovie.Request request) throws ParseException, InterruptedException {
 
-    @Async
-    @Override
-    public UpdateMovie.Response saveAllMovies(UpdateMovie.Request request) throws ParseException, InterruptedException {
-
-        int movieCount = 0;
-        int castCount = 0;
-
-        // 장르 저장하기
-        log.info("Get Genre start : {}", LocalDateTime.now());
-        JSONArray genreArrayEng = getGenre(request, LANG_ENG);
-        JSONArray genreArrayKor = getGenre(request, LANG_KOREAN);
-        log.info("Get Genre finish : {}", LocalDateTime.now());
-
-        log.info("Save Genre start : {}", LocalDateTime.now());
-        saveGenre(genreArrayEng, genreArrayKor);
-        log.info("Save Genre finish : {}", LocalDateTime.now());
+        int[] counts = new int[2];
 
         // ===== 영화 정보 페이지, 하나씩 가지고 오기 (for문으로 1부터 500) =====
-        String moviePopularUrl = "https://api.themoviedb.org/3/movie/popular?language=";
 
-        for (int pageNum = 460; pageNum <= 500; pageNum++) {
+        for (int pageNum = start; pageNum < start + movieNum; pageNum++) {
             String pg = String.format("&page=%d", pageNum);
 
-            String moviePopularUrlEng = moviePopularUrl + LANG_ENG + pg;
+            String moviePopularUrlEng = movieUrl + LANG_ENG + pg;
 
-            String moviePopularUrlKor = moviePopularUrl + LANG_KOREAN + pg;
+            String moviePopularUrlKor = movieUrl + LANG_KOREAN + pg;
 
             log.info("Get MovieList page {} start : {}", pageNum, LocalDateTime.now());
             JSONArray movieListEng = getMovieList(request, moviePopularUrlEng);
@@ -364,7 +377,7 @@ public class MovieServiceImpl implements MovieService {
             log.info("Get MovieList page {} finish : {}", pageNum, LocalDateTime.now());
 
             log.info("Save MovieList page {} start : {}", pageNum, LocalDateTime.now());
-            movieCount += saveMovie(movieListEng, movieListKor);
+            counts[0] += saveMovie(movieListEng, movieListKor);
             log.info("Save MovieList page {} finish : {}", pageNum, LocalDateTime.now());
 
 
@@ -385,19 +398,74 @@ public class MovieServiceImpl implements MovieService {
                 JSONObject credits = (JSONObject) movieDetail.get("credits");
                 JSONArray cast = (JSONArray) credits.get("cast");
 
-                castCount += saveCast(cast, movieIdForCast);
+                counts[1] += saveCast(cast, movieIdForCast);
 
                 log.info("Save Cast for movie {} finish : {}", movieIdForCast, LocalDateTime.now());
 
             }
-
-            Thread.sleep(2000);
         }
+
+        return counts;
+    }
+
+    private Long totalPages(UpdateMovie.Request request, String url) throws ParseException {
+
+        JSONObject movieResult = tmdbGetResult(url,
+                request.getApiKey());
+
+        return (Long) movieResult.get("total_pages");
+    }
+
+    @Async
+    @Override
+    public UpdateMovie.Response saveAllMovies(UpdateMovie.Request request) throws ParseException, InterruptedException {
+
+        // 장르 저장하기
+        log.info("Get Genre start : {}", LocalDateTime.now());
+        JSONArray genreArrayEng = getGenre(request, LANG_ENG);
+        JSONArray genreArrayKor = getGenre(request, LANG_KOREAN);
+        log.info("Get Genre finish : {}", LocalDateTime.now());
+
+        log.info("Save Genre start : {}", LocalDateTime.now());
+        saveGenre(genreArrayEng, genreArrayKor);
+        log.info("Save Genre finish : {}", LocalDateTime.now());
+
+        String moviePopularUrl = "https://api.themoviedb.org/3/movie/popular?language=";
+
+        int[] counts = saveMovies(moviePopularUrl, 1, 500, request);
 
         return UpdateMovie.Response.builder()
                 .message("DB에 저장된 영화와 캐스트. 이미 저장이 되어 있는 데이터일 수도 있습니다 (0이 나올시).")
-                .movieNum(movieCount)
-                .peopleNum(castCount)
+                .movieNum(counts[0])
+                .peopleNum(counts[1])
+                .build();
+    }
+
+    // 오늘 기준 2달 전까지 영화관에서 상영했던, 또는 하고 있는 모든 영화를 DB에 저장하기
+    @Async
+    @Override
+    public UpdateMovie.Response updateNewMovies(UpdateMovie.Request request) throws ParseException, InterruptedException {
+
+        // 장르 저장하기
+        log.info("Get New Genre start : {}", LocalDateTime.now());
+        JSONArray genreArrayEng = getGenre(request, LANG_ENG);
+        JSONArray genreArrayKor = getGenre(request, LANG_KOREAN);
+        log.info("Get New Genre finish : {}", LocalDateTime.now());
+
+        log.info("Save New Genre start : {}", LocalDateTime.now());
+        saveGenre(genreArrayEng, genreArrayKor);
+        log.info("Save New Genre finish : {}", LocalDateTime.now());
+
+        String movieNowPlayingUrl = "https://api.themoviedb.org/3/movie/now_playing?language=";
+
+        int pages = Math.toIntExact(totalPages(request, movieNowPlayingUrl + LANG_ENG + "&page=1"));
+
+        int[] counts = saveMovies(movieNowPlayingUrl, 1, pages, request);
+
+        return UpdateMovie.Response.builder()
+                .message("DB에 저장된 영화와 캐스트. 이미 저장이 되어 있는 데이터일 수도 있습니다 (0이 나올시).")
+                .movieNum(counts[0])
+                .peopleNum(counts[1])
                 .build();
     }
 }
