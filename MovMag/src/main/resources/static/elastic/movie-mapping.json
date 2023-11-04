@@ -1,0 +1,46 @@
+{
+  "properties": {
+
+    "movieId": {
+      "type": "keyword"
+    },
+
+    "genreId": {
+      "type" : "object"
+    },
+
+    "titleEng": {
+      "type": "text"
+    },
+
+    "titleKor": {
+      "type": "text",
+      "analyzer": "korean"
+    },
+
+    "overviewEng": {
+      "type": "text"
+    },
+
+    "overviewKor": {
+      "type": "text",
+      "analyzer": "korean"
+    },
+
+    "released_date": {
+      "type": "text"
+    },
+
+    "movie_score": {
+      "type": "double"
+    },
+
+    "runtime": {
+      "type": "long"
+    },
+
+    "poster_path": {
+      "type":"text"
+    }
+  }
+}

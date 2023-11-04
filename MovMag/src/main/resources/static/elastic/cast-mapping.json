@@ -1,0 +1,20 @@
+{
+  "properties": {
+
+    "castId": {
+      "type": "keyword"
+    },
+
+    "movieId": {
+      "type" : "object"
+    },
+
+    "nameEng": {
+      "type": "text"
+    },
+
+    "role": {
+      "type": "text"
+    }
+  }
+}

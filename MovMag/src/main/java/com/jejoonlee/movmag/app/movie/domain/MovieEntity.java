@@ -1,12 +1,15 @@
 package com.jejoonlee.movmag.app.movie.domain;
 
+import io.hypersistence.utils.hibernate.type.json.JsonType;
 import lombok.*;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.Column;
-import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 
 @Setter
 @Getter
@@ -15,15 +18,16 @@ import java.util.HashSet;
 @ToString
 @Builder
 @Entity(name="movie")
+@TypeDef(name = "json", typeClass = JsonType.class)
 public class MovieEntity {
 
     @Id
     @Column(name = "movie_id")
     private Long movieId;
 
-    @Column(name = "genre")
-    @Convert(converter = LongSetConverter.class)
-    private HashSet<Long> genreId = new HashSet<>();
+    @Type(type="json")
+    @Column(name="genre_id", columnDefinition = "json")
+    private Map<String, Object> genreId = new HashMap<>();
 
     @Column(name = "title_eng")
     private String titleEng;
