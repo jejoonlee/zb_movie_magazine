@@ -13,20 +13,14 @@ import com.jejoonlee.movmag.app.movie.repository.MovieRepository;
 import com.jejoonlee.movmag.app.movie.service.MovieService;
 import com.jejoonlee.movmag.exception.ErrorCode;
 import com.jejoonlee.movmag.exception.MovieException;
-import com.jejoonlee.movmag.exception.TmdbError;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -39,65 +33,10 @@ public class MovieServiceImpl implements MovieService {
     private final GenreRepository genreRepository;
     private final CastRepository castRepository;
 
+    private final MovieExternalApiClient movieExternalApiClient;
+
     private String LANG_KOREAN = "ko-KR";
     private String LANG_ENG = "en-US";
-
-    private static JSONObject tmdbGetResult(String urlString, String apiKey) throws ParseException {
-
-        StringBuilder urlBuilder = new StringBuilder(urlString);
-        StringBuilder sb = new StringBuilder();
-
-        try {
-            URL url = new URL(urlBuilder.toString());
-
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setRequestProperty("Content-type", "application/json");
-            connection.setRequestProperty("Authorization", "Bearer " + apiKey);
-
-
-            BufferedReader br;
-
-            if (connection.getResponseCode() >= 200 && connection.getResponseCode() <= 300) {
-                br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            } else {
-                br = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
-            }
-
-            String line;
-
-            while ((line = br.readLine()) != null) {
-                sb.append(line);
-            }
-            br.close();
-            connection.disconnect();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        JSONObject result = (JSONObject) new JSONParser().parse(sb.toString());
-
-        return result;
-    }
-
-    private JSONArray getGenre(UpdateMovie.Request request, String language) throws ParseException {
-        // 장르 업데이트 하기
-        String genreURL = "https://api.themoviedb.org/3/genre/movie/list?language=";
-
-        JSONObject genreResult = tmdbGetResult(genreURL + language,
-                request.getApiKey());
-
-        ErrorCode genreEngErrorCode = isSuccessful(genreResult);
-
-        if (!genreEngErrorCode.equals(ErrorCode.TMDB_SUCCESS)) {
-            throw new MovieException(genreEngErrorCode);
-        }
-
-        JSONArray genreList = (JSONArray) genreResult.get("genres");
-
-        return genreList;
-    }
 
     private void saveGenre(JSONArray genreArrayEng, JSONArray genreArrayKor) {
         genreRepository.save(GenreDto.toEntity(GenreDto.builder()
@@ -143,23 +82,6 @@ public class MovieServiceImpl implements MovieService {
 
             genreRepository.save(GenreDto.toEntity(genreDto));
         }
-    }
-
-    // 영화 리스트 가지고 오기
-    private JSONArray getMovieList(UpdateMovie.Request request, String url) throws ParseException {
-
-        JSONObject movieResult = tmdbGetResult(url,
-                request.getApiKey());
-
-        ErrorCode genreEngErrorCode = isSuccessful(movieResult);
-
-        if (!genreEngErrorCode.equals(ErrorCode.TMDB_SUCCESS)) {
-            throw new MovieException(genreEngErrorCode);
-        }
-
-        JSONArray movieList = (JSONArray) movieResult.get("results");
-
-        return movieList;
     }
 
     // 가지고 온 영화 리스트 저장하기
@@ -253,25 +175,6 @@ public class MovieServiceImpl implements MovieService {
         return count;
     }
 
-    // 영화 디테일에서 감독 또는 배우 정보 가지고 오기
-    private JSONObject getMovieDetail(UpdateMovie.Request request, Long movieId) throws ParseException {
-
-        String movieUrl = String.format(
-                "https://api.themoviedb.org/3/movie/%d?append_to_response=credits&language=en-US",
-                movieId);
-
-        JSONObject movieDetailResult = tmdbGetResult(movieUrl,
-                request.getApiKey());
-
-        ErrorCode genreEngErrorCode = isSuccessful(movieDetailResult);
-
-        if (!genreEngErrorCode.equals(ErrorCode.TMDB_SUCCESS)) {
-            throw new MovieException(genreEngErrorCode);
-        }
-
-        return movieDetailResult;
-    }
-
     private void saveRuntimeToMovie(JSONObject movieDetail) {
         Long runtime = (Long) movieDetail.get("runtime");
 
@@ -348,16 +251,6 @@ public class MovieServiceImpl implements MovieService {
         return count;
     }
 
-    private static ErrorCode isSuccessful(JSONObject result) {
-
-        if (result.containsKey("status_code")) {
-            ErrorCode errorCode = TmdbError.check((Long) result.get("status_code"));
-            return errorCode;
-        } else {
-            return ErrorCode.TMDB_SUCCESS;
-        }
-
-    }
     private int[] saveMovies(String movieUrl, int start, int movieNum, UpdateMovie.Request request) throws ParseException, InterruptedException {
 
         int[] counts = new int[2];
@@ -372,49 +265,49 @@ public class MovieServiceImpl implements MovieService {
             String moviePopularUrlKor = movieUrl + LANG_KOREAN + pg;
 
             log.info("Get MovieList page {} start : {}", pageNum, LocalDateTime.now());
-            JSONArray movieListEng = getMovieList(request, moviePopularUrlEng);
-            JSONArray movieListKor = getMovieList(request, moviePopularUrlKor);
+//            JSONArray movieListEng = movieExternalApiClient.getMovieList(request, moviePopularUrlEng);
+//            JSONArray movieListKor = movieExternalApiClient.getMovieList(request, moviePopularUrlKor);
             log.info("Get MovieList page {} finish : {}", pageNum, LocalDateTime.now());
 
             log.info("Save MovieList page {} start : {}", pageNum, LocalDateTime.now());
-            counts[0] += saveMovie(movieListEng, movieListKor);
+//            counts[0] += saveMovie(movieListEng, movieListKor);
             log.info("Save MovieList page {} finish : {}", pageNum, LocalDateTime.now());
 
 
             // 디테일에서 런타임 저장 + cast 저장
-            for (int i = 0; i < movieListEng.size(); i ++) {
-
-                JSONObject movie = (JSONObject) movieListEng.get(i);
-                Long movieIdForCast = (Long) movie.get("id");
-
-                JSONObject movieDetail = getMovieDetail(request, (Long) movieIdForCast);
-
-                // 영화 런타임 저장
-                saveRuntimeToMovie(movieDetail);
-
-                log.info("Save Cast for movie {} start : {}", movieIdForCast, LocalDateTime.now());
-
-                // cast 저장
-                JSONObject credits = (JSONObject) movieDetail.get("credits");
-                JSONArray cast = (JSONArray) credits.get("cast");
-
-                counts[1] += saveCast(cast, movieIdForCast);
-
-                log.info("Save Cast for movie {} finish : {}", movieIdForCast, LocalDateTime.now());
-
-            }
+//            for (int i = 0; i < movieListEng.size(); i ++) {
+//
+//                JSONObject movie = (JSONObject) movieListEng.get(i);
+//                Long movieIdForCast = (Long) movie.get("id");
+//
+//                JSONObject movieDetail = movieExternalApiClient.getMovieDetail(request, (Long) movieIdForCast);
+//
+//                // 영화 런타임 저장
+//                saveRuntimeToMovie(movieDetail);
+//
+//                log.info("Save Cast for movie {} start : {}", movieIdForCast, LocalDateTime.now());
+//
+//                // cast 저장
+//                JSONObject credits = (JSONObject) movieDetail.get("credits");
+//                JSONArray cast = (JSONArray) credits.get("cast");
+//
+//                counts[1] += saveCast(cast, movieIdForCast);
+//
+//                log.info("Save Cast for movie {} finish : {}", movieIdForCast, LocalDateTime.now());
+//
+//            }
         }
 
         return counts;
     }
 
-    private Long totalPages(UpdateMovie.Request request, String url) throws ParseException {
-
-        JSONObject movieResult = tmdbGetResult(url,
-                request.getApiKey());
-
-        return (Long) movieResult.get("total_pages");
-    }
+//    private Long totalPages(UpdateMovie.Request request, String url) throws ParseException {
+//
+//        JSONObject movieResult = movieExternalApiClient.tmdbGetResult(url,
+//                request.getApiKey());
+//
+//        return (Long) movieResult.get("total_pages");
+//    }
 
     @Async
     @Override
@@ -422,12 +315,12 @@ public class MovieServiceImpl implements MovieService {
 
         // 장르 저장하기
         log.info("Get Genre start : {}", LocalDateTime.now());
-        JSONArray genreArrayEng = getGenre(request, LANG_ENG);
-        JSONArray genreArrayKor = getGenre(request, LANG_KOREAN);
+//        JSONArray genreArrayEng = movieExternalApiClient.getGenre(request, LANG_ENG);
+//        JSONArray genreArrayKor = movieExternalApiClient.getGenre(request, LANG_KOREAN);
         log.info("Get Genre finish : {}", LocalDateTime.now());
 
         log.info("Save Genre start : {}", LocalDateTime.now());
-        saveGenre(genreArrayEng, genreArrayKor);
+//        saveGenre(genreArrayEng, genreArrayKor);
         log.info("Save Genre finish : {}", LocalDateTime.now());
 
         String moviePopularUrl = "https://api.themoviedb.org/3/movie/popular?language=";
@@ -442,25 +335,26 @@ public class MovieServiceImpl implements MovieService {
     }
 
     // 오늘 기준 2달 전까지 영화관에서 상영했던, 또는 하고 있는 모든 영화를 DB에 저장하기
-    @Async
+//    @Async
     @Override
     public UpdateMovie.Response updateNewMovies(UpdateMovie.Request request) throws ParseException, InterruptedException {
 
         // 장르 저장하기
         log.info("Get New Genre start : {}", LocalDateTime.now());
-        JSONArray genreArrayEng = getGenre(request, LANG_ENG);
-        JSONArray genreArrayKor = getGenre(request, LANG_KOREAN);
+//        movieExternalApiClient.getGenre(request, LANG_ENG);
+//        movieExternalApiClient.getGenre(request, LANG_KOREAN);
         log.info("Get New Genre finish : {}", LocalDateTime.now());
 
         log.info("Save New Genre start : {}", LocalDateTime.now());
-        saveGenre(genreArrayEng, genreArrayKor);
+//        saveGenre(genreArrayEng, genreArrayKor);
         log.info("Save New Genre finish : {}", LocalDateTime.now());
 
         String movieNowPlayingUrl = "https://api.themoviedb.org/3/movie/now_playing?language=";
 
-        int pages = Math.toIntExact(totalPages(request, movieNowPlayingUrl + LANG_ENG + "&page=1"));
+//        int pages = Math.toIntExact(totalPages(request, movieNowPlayingUrl + LANG_ENG + "&page=1"));
 
-        int[] counts = saveMovies(movieNowPlayingUrl, 1, pages, request);
+        int[] counts = new int[]{0, 0};
+//        int[] counts = saveMovies(movieNowPlayingUrl, 1, pages, request);
 
         return UpdateMovie.Response.builder()
                 .message("DB에 저장된 영화와 캐스트. 이미 저장이 되어 있는 데이터일 수도 있습니다 (0이 나올시).")
