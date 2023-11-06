@@ -311,7 +311,7 @@ public class MovieServiceImpl implements MovieService {
         saveGenre(genreListEng, genreListKor);
         log.info("Save Genre finish : {}", LocalDateTime.now());
 
-        int[] counts = saveMovies(apiKey, 1, 500);
+        int[] counts = saveMovies(apiKey, 99, 500);
 
         return UpdateMovie.Response.builder()
                 .message("DB에 저장된 영화와 캐스트. 이미 저장이 되어 있는 데이터일 수도 있습니다 (0이 나올시).")
@@ -321,7 +321,7 @@ public class MovieServiceImpl implements MovieService {
     }
 
     // 오늘 기준 2달 전까지 영화관에서 상영했던, 또는 하고 있는 모든 영화를 DB에 저장하기
-//    @Async
+    @Async
     @Override
     public UpdateMovie.Response updateNewMovies(UpdateMovie.Request request) {
 
