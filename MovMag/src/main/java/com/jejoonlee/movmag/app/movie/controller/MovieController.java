@@ -6,7 +6,6 @@ import com.jejoonlee.movmag.app.elasticsearch.service.CastSearchService;
 import com.jejoonlee.movmag.app.elasticsearch.service.MovieSearchService;
 import com.jejoonlee.movmag.app.movie.dto.UpdateMovie;
 import com.jejoonlee.movmag.app.movie.service.MovieService;
-import com.jejoonlee.movmag.app.movie.service.impl.MovieExternalApiClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.parser.ParseException;
@@ -73,18 +72,5 @@ public class MovieController {
             @RequestParam String name
     ){
         return ResponseEntity.ok(castSearchService.searchByCast(name));
-    }
-
-    private final MovieExternalApiClient movieExternalApiClient;
-
-    @PostMapping("/test_tmdb")
-    public String test(
-            @RequestBody String apiKey
-    ) {
-
-        movieExternalApiClient.test(apiKey);
-
-        return "dddd";
-
     }
 }

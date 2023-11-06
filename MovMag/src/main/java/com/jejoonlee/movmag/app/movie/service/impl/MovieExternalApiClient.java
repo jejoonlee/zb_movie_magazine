@@ -14,6 +14,7 @@ public class MovieExternalApiClient {
     private static final WebClient webClient = WebClient.builder()
             .baseUrl("https://api.themoviedb.org/3")
             .defaultHeader(HttpHeaders.ACCEPT, "application/json")
+            .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(-1))
             .build();
 
     static MovieExternalApiDto.GenreList getGenre(String apiKey, String language) {
@@ -31,23 +32,35 @@ public class MovieExternalApiClient {
         return response;
     }
 
+    static MovieExternalApiDto.MovieList getMovieList(String apiKey, String language, String page) {
 
-    public void test(String apiKey) {
-
-        log.info("=============start webclient=============");
-
-        MovieExternalApiDto.GenreList response = webClient.get()
+        MovieExternalApiDto.MovieList response = webClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path("/genre/movie/list")
-                        .queryParam("language", "en")
+                        .path("/movie/popular")
+                        .queryParam("language", language)
+                        .queryParam("page", page)
                         .build())
                 .header(HttpHeaders.AUTHORIZATION, apiKey)
                 .retrieve()
-                .bodyToMono(MovieExternalApiDto.GenreList.class)
+                .bodyToMono(MovieExternalApiDto.MovieList.class)
                 .block();
 
-        log.info("{}", response.getGenres().get(0).getName());
+        return response;
+    }
 
-        log.info("=============end webclient============");
+    // 캐스트들 정보와 런타임 정보
+    static MovieExternalApiDto.MovieDetail getMovieDetail(String apiKey, Long movieId) {
+
+        MovieExternalApiDto.MovieDetail response = webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/movie/" + String.valueOf(movieId))
+                        .queryParam("append_to_response", "credits")
+                        .build())
+                .header(HttpHeaders.AUTHORIZATION, apiKey)
+                .retrieve()
+                .bodyToMono(MovieExternalApiDto.MovieDetail.class)
+                .block();
+
+        return response;
     }
 }
