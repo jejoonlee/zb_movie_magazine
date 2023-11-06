@@ -3,7 +3,7 @@ package com.jejoonlee.movmag.app.movie.service.impl;
 import com.jejoonlee.movmag.app.movie.dto.MovieExternalApiDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpHeaders;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -11,29 +11,37 @@ import org.springframework.web.reactive.function.client.WebClient;
 @RequiredArgsConstructor
 @Service
 public class MovieExternalApiClient {
-
-    private String API_KEY;
-
-    private final WebClient webClient = WebClient.builder()
+    private static final WebClient webClient = WebClient.builder()
             .baseUrl("https://api.themoviedb.org/3")
+            .defaultHeader(HttpHeaders.ACCEPT, "application/json")
             .build();
 
-    public void test(String api) {
+    static MovieExternalApiDto.GenreList getGenre(String apiKey, String language) {
+
+        MovieExternalApiDto.GenreList response = webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/genre/movie/list")
+                        .queryParam("language", language)
+                        .build())
+                .header(HttpHeaders.AUTHORIZATION, apiKey)
+                .retrieve()
+                .bodyToMono(MovieExternalApiDto.GenreList.class)
+                .block();
+
+        return response;
+    }
+
+
+    public void test(String apiKey) {
 
         log.info("=============start webclient=============");
-
-        API_KEY = api;
-
-        log.info("{}", API_KEY);
-        log.info("{}", webClient.head());
 
         MovieExternalApiDto.GenreList response = webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/genre/movie/list")
                         .queryParam("language", "en")
                         .build())
-                .header(HttpHeaders.AUTHORIZATION, API_KEY)
-                .header(HttpHeaders.ACCEPT, "application/json")
+                .header(HttpHeaders.AUTHORIZATION, apiKey)
                 .retrieve()
                 .bodyToMono(MovieExternalApiDto.GenreList.class)
                 .block();

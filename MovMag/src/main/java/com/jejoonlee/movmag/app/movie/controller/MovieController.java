@@ -79,10 +79,10 @@ public class MovieController {
 
     @PostMapping("/test_tmdb")
     public String test(
-            @RequestBody String api
+            @RequestBody String apiKey
     ) {
 
-        movieExternalApiClient.test(api);
+        movieExternalApiClient.test(apiKey);
 
         return "dddd";
 

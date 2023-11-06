@@ -3,10 +3,7 @@ package com.jejoonlee.movmag.app.movie.service.impl;
 import com.jejoonlee.movmag.app.movie.domain.CastEntity;
 import com.jejoonlee.movmag.app.movie.domain.GenreEntity;
 import com.jejoonlee.movmag.app.movie.domain.MovieEntity;
-import com.jejoonlee.movmag.app.movie.dto.CastDto;
-import com.jejoonlee.movmag.app.movie.dto.GenreDto;
-import com.jejoonlee.movmag.app.movie.dto.MovieDto;
-import com.jejoonlee.movmag.app.movie.dto.UpdateMovie;
+import com.jejoonlee.movmag.app.movie.dto.*;
 import com.jejoonlee.movmag.app.movie.repository.CastRepository;
 import com.jejoonlee.movmag.app.movie.repository.GenreRepository;
 import com.jejoonlee.movmag.app.movie.repository.MovieRepository;
@@ -38,18 +35,24 @@ public class MovieServiceImpl implements MovieService {
     private String LANG_KOREAN = "ko-KR";
     private String LANG_ENG = "en-US";
 
-    private void saveGenre(JSONArray genreArrayEng, JSONArray genreArrayKor) {
+    private void saveGenre(MovieExternalApiDto.GenreList genreArrayEng, MovieExternalApiDto.GenreList genreArrayKor) {
+
         genreRepository.save(GenreDto.toEntity(GenreDto.builder()
                         .genreId(0L)
                         .genreKor("장르 없음")
                         .genreEng("No Genre")
                 .build()));
 
-        for (int i = 0; i < genreArrayEng.size(); i ++) {
-            JSONObject genreEng = (JSONObject) genreArrayEng.get(i);
+        List<MovieExternalApiDto.Genre> genreEngList = genreArrayEng.getGenres();
+        List<MovieExternalApiDto.Genre> genreKorList = genreArrayKor.getGenres();
 
-            Long genreEngId = (Long) genreEng.get("id");
-            String genreNameEng = (String) genreEng.get("name");
+        for (int i = 0; i < genreEngList.size(); i ++) {
+            MovieExternalApiDto.Genre genreEng = genreEngList.get(i);
+
+            log.info("{}", genreEng.getName());
+
+            Long genreEngId = genreEng.getId();
+            String genreNameEng = genreEng.getName();
 
             GenreDto genreDto = GenreDto.builder()
                     .genreId(genreEngId)
@@ -59,11 +62,11 @@ public class MovieServiceImpl implements MovieService {
             genreRepository.save(GenreDto.toEntity(genreDto));
         }
 
-        for (int i = 0; i < genreArrayKor.size(); i++) {
-            JSONObject genreKor = (JSONObject) genreArrayKor.get(i);
+        for (int i = 0; i < genreKorList.size(); i++) {
+            MovieExternalApiDto.Genre genreKor = genreKorList.get(i);
 
-            Long genreKorId = (Long) genreKor.get("id");
-            String genreNameKor = (String) genreKor.get("name");
+            Long genreKorId = genreKor.getId();
+            String genreNameKor = genreKor.getName();
 
             GenreDto genreDto;
 
@@ -313,19 +316,23 @@ public class MovieServiceImpl implements MovieService {
     @Override
     public UpdateMovie.Response saveAllMovies(UpdateMovie.Request request) throws ParseException, InterruptedException {
 
+        String apiKey = "Bearer " + request.getApiKey();
+
         // 장르 저장하기
         log.info("Get Genre start : {}", LocalDateTime.now());
-//        JSONArray genreArrayEng = movieExternalApiClient.getGenre(request, LANG_ENG);
-//        JSONArray genreArrayKor = movieExternalApiClient.getGenre(request, LANG_KOREAN);
+        MovieExternalApiDto.GenreList genreListEng = movieExternalApiClient.getGenre(apiKey, LANG_ENG);
+        MovieExternalApiDto.GenreList genreListKor = movieExternalApiClient.getGenre(apiKey, LANG_KOREAN);
         log.info("Get Genre finish : {}", LocalDateTime.now());
 
         log.info("Save Genre start : {}", LocalDateTime.now());
-//        saveGenre(genreArrayEng, genreArrayKor);
+        saveGenre(genreListEng, genreListKor);
         log.info("Save Genre finish : {}", LocalDateTime.now());
 
-        String moviePopularUrl = "https://api.themoviedb.org/3/movie/popular?language=";
+//        String moviePopularUrl = "https://api.themoviedb.org/3/movie/popular?language=";
 
-        int[] counts = saveMovies(moviePopularUrl, 1, 500, request);
+//        int[] counts = saveMovies(moviePopularUrl, 1, 500, request);
+
+        int[] counts = new int[]{0,0};
 
         return UpdateMovie.Response.builder()
                 .message("DB에 저장된 영화와 캐스트. 이미 저장이 되어 있는 데이터일 수도 있습니다 (0이 나올시).")
