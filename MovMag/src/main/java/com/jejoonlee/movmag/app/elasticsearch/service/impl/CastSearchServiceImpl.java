@@ -11,6 +11,7 @@ import com.jejoonlee.movmag.exception.ErrorCode;
 import com.jejoonlee.movmag.exception.MovieException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -46,10 +47,17 @@ public class CastSearchServiceImpl implements CastSearchService {
         return dataCount;
     }
 
-    private List<CastElsDto.Response> getMovieByCast(String name) {
+    private CastElsDto.Page getMovieByCast(String name, int page) {
 
-        List<CastDocument> castDocumentList = castSearchRepository.findAllByNameEng(name);
+        Page<CastDocument> castDocumentPage =
+                castSearchRepository.findAllByNameEng(name, PageRequest.of(page - 1, 10));
+
         List<CastElsDto.Response> result = new ArrayList<>();
+
+        List<CastDocument> castDocumentList = castDocumentPage.getContent();
+
+        if (page <= 0 && page > castDocumentPage.getTotalPages())
+            throw new MovieException(ErrorCode.PAGE_NOT_FOUND);
 
         if (castDocumentList.size() == 0)
             throw new MovieException(ErrorCode.CAST_NOT_FOUND);
@@ -67,7 +75,6 @@ public class CastSearchServiceImpl implements CastSearchService {
             for (int num : movieIds) {
                 Long movieId = Long.valueOf(num);
 
-
                 if (movieRepository.existsById(movieId)) {
 
                     MovieDto movieDto = MovieDto.fromEntity(movieRepository.findById(movieId).get());
@@ -76,7 +83,6 @@ public class CastSearchServiceImpl implements CastSearchService {
 
                     featuredMovies.add(castMovie);
                 }
-
             }
 
             castElsDto.setFeaturedMovies(featuredMovies);
@@ -84,12 +90,16 @@ public class CastSearchServiceImpl implements CastSearchService {
             result.add(castElsDto);
         }
 
-        return result;
+        return CastElsDto.Page.builder()
+                .page(page)
+                .totalPage(castDocumentPage.getTotalPages())
+                .foundDataNum(castDocumentPage.getTotalElements())
+                .data(result)
+                .build();
     }
 
     @Override
-    public List<CastElsDto.Response> searchByCast(String name) {
-
-        return getMovieByCast(name);
+    public CastElsDto.Page searchByCast(String name, int page) {
+        return getMovieByCast(name, page);
     }
 }

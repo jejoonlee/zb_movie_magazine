@@ -13,6 +13,16 @@ public class CastElsDto {
     @Builder
     @Getter
     @Setter
+    public static class Page {
+        private int page;
+        private int totalPage;
+        private Long foundDataNum;
+        private List<Response> data;
+    }
+
+    @Builder
+    @Getter
+    @Setter
     public static class Movie {
         private Long movieId;
         private String titleEng;

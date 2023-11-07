@@ -12,8 +12,6 @@ import org.json.simple.parser.ParseException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @Slf4j
 @RestController
 @RequestMapping("/movie")
@@ -69,9 +67,10 @@ public class MovieController {
     }
 
     @GetMapping("/cast")
-    public ResponseEntity<List<CastElsDto.Response>> searchMovieByCast(
-            @RequestParam String name
+    public ResponseEntity<CastElsDto.Page> searchMovieByCast(
+            @RequestParam String name,
+            @RequestParam int page
     ){
-        return ResponseEntity.ok(castSearchService.searchByCast(name));
+        return ResponseEntity.ok(castSearchService.searchByCast(name, page));
     }
 }
