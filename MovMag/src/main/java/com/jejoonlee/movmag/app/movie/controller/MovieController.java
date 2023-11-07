@@ -7,12 +7,14 @@ import com.jejoonlee.movmag.app.elasticsearch.service.MovieSearchService;
 import com.jejoonlee.movmag.app.movie.dto.UpdateMovie;
 import com.jejoonlee.movmag.app.movie.service.MovieService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.json.simple.parser.ParseException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/movie")
 @RequiredArgsConstructor
