@@ -1,6 +1,7 @@
 package com.jejoonlee.movmag.app.movie.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,8 +26,12 @@ public class MovieExternalApiDto {
     @Setter
     public static class MovieList{
         private int page;
-        private int total_pages;
-        private int total_results;
+
+        @JsonProperty("total_pages")
+        private int totalPages;
+
+        @JsonProperty("total_results")
+        private int totalResults;
         private List<MovieInfo> results;
     }
 
@@ -34,11 +39,18 @@ public class MovieExternalApiDto {
     @Setter
     public static class MovieInfo {
         private Long id;
-        private List<Long> genre_ids;
+
+        @JsonProperty("genre_ids")
+        private List<Long> genreIds;
+
         private String title;
         private String overview;
-        private String release_date;
-        private String poster_path;
+
+        @JsonProperty("release_date")
+        private String releaseDate;
+
+        @JsonProperty("poster_path")
+        private String posterPath;
     }
 
     @Getter
@@ -58,7 +70,9 @@ public class MovieExternalApiDto {
     public static class CastInfo{
         private Long id;
         private String name;
-        private String known_for_department;
+
+        @JsonProperty("known_for_department")
+        private String knownForDepartment;
     }
 
 }

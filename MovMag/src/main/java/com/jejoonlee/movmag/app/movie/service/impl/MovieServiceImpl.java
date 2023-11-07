@@ -7,6 +7,7 @@ import com.jejoonlee.movmag.app.movie.dto.*;
 import com.jejoonlee.movmag.app.movie.repository.CastRepository;
 import com.jejoonlee.movmag.app.movie.repository.GenreRepository;
 import com.jejoonlee.movmag.app.movie.repository.MovieRepository;
+import com.jejoonlee.movmag.app.movie.service.MovieExternalApiClient;
 import com.jejoonlee.movmag.app.movie.service.MovieService;
 import com.jejoonlee.movmag.exception.ErrorCode;
 import com.jejoonlee.movmag.exception.MovieException;
@@ -18,7 +19,10 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -95,7 +99,7 @@ public class MovieServiceImpl implements MovieService {
         for (int i = 0; i < movieInfoListEng.size(); i++) {
             MovieExternalApiDto.MovieInfo movie = movieInfoListEng.get(i);
 
-            List<Long> genreIds = movie.getGenre_ids();
+            List<Long> genreIds = movie.getGenreIds();
 
             if (!movieRepository.existsById(movie.getId())) {
 
@@ -117,9 +121,9 @@ public class MovieServiceImpl implements MovieService {
                         .genreId(genreIdMap)
                         .titleEng(movie.getTitle())
                         .overviewEng(movie.getOverview())
-                        .releasedDate(movie.getRelease_date())
+                        .releasedDate(movie.getReleaseDate())
                         .movieScore(0.0)
-                        .posterPath(movie.getPoster_path())
+                        .posterPath(movie.getPosterPath())
                         .build();
 
                 movieRepository.save(MovieDto.toEntity(movieDto));
@@ -131,7 +135,7 @@ public class MovieServiceImpl implements MovieService {
             MovieExternalApiDto.MovieInfo movie = movieInfoListKor.get(i);
             Long movieId = movie.getId();
 
-            List<Long> genreIds = movie.getGenre_ids();
+            List<Long> genreIds = movie.getGenreIds();
 
             if (!movieRepository.existsById(movieId)) {
 
@@ -153,9 +157,9 @@ public class MovieServiceImpl implements MovieService {
                         .genreId(genreIdMap)
                         .titleKor(movie.getTitle())
                         .overviewKor(movie.getOverview())
-                        .releasedDate(movie.getRelease_date())
+                        .releasedDate(movie.getReleaseDate())
                         .movieScore(0.0)
-                        .posterPath(movie.getPoster_path())
+                        .posterPath(movie.getPosterPath())
                         .build();
 
                 movieRepository.save(MovieDto.toEntity(movieDto));
@@ -194,7 +198,7 @@ public class MovieServiceImpl implements MovieService {
 
         for (MovieExternalApiDto.CastInfo castInfo : castList) {
 
-            String role = castInfo.getKnown_for_department();
+            String role = castInfo.getKnownForDepartment();
 
             Long castId = castInfo.getId();
 
@@ -337,7 +341,7 @@ public class MovieServiceImpl implements MovieService {
         saveGenre(genreListEng, genreListKor);
         log.info("Save New Genre finish : {}", LocalDateTime.now());
 
-        int pages = movieExternalApiClient.getMovieList(apiKey, LANG_ENG, "1").getTotal_pages();
+        int pages = movieExternalApiClient.getMovieList(apiKey, LANG_ENG, "1").getTotalPages();
 
         int[] counts = saveMovies(apiKey, 1, pages);
 
