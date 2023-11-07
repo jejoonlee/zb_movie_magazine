@@ -198,11 +198,9 @@ public class MovieServiceImpl implements MovieService {
 
             Long castId = castInfo.getId();
 
-            boolean savedCast = castRepository.existsById(castId);
-
             CastDto castDto;
 
-            if (!savedCast) {
+            if (!castRepository.existsById(castId)) {
                 JSONArray movieArray = new JSONArray();
 
                 movieArray.add(movieId);
@@ -230,16 +228,17 @@ public class MovieServiceImpl implements MovieService {
 
                 Map<String, Object> movieIdMap = castDto.getMovieId();
 
+                Set<Long> movieIdSet = new HashSet<>();
+
                 ArrayList<Integer> movieIdList = (ArrayList<Integer>) movieIdMap.get("movieId");
 
-                movieIdList.add(Math.toIntExact(movieId));
+                for (int id : movieIdList) movieIdSet.add((long) id);
 
-                movieIdList.stream().distinct();
+                movieIdSet.add(movieId);
 
-                movieIdMap.put("movieId", movieIdList);
+                movieIdMap.put("movieId", new ArrayList<>(movieIdSet));
 
                 castDto.setMovieId(movieIdMap);
-
             }
 
             castRepository.save(CastDto.toEntity(castDto));
