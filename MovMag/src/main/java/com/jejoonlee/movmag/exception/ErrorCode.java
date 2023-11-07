@@ -71,8 +71,9 @@ public enum ErrorCode {
     TMDB_INVALID_INPUT("입력하신 값이 유효하지 않습니다"),
 
     // 영화 찾기
-    NO_MOVIE_FOUND("영화를 찾을 수 없습니다"),
-    WRONG_LANGUAGE("한글로 검색하기 위해서는 'korean' 을, 영어로 검색하기 위해서는 'english' 를 lang 쿼리에 입력해주세요.");
+    NO_MOVIE_FOUND("영화가 없거나 페이지 입력을 다시해주세요"),
+    WRONG_LANGUAGE("한글로 검색하기 위해서는 'korean' 을, 영어로 검색하기 위해서는 'english' 를 lang 쿼리에 입력해주세요."),
+    PAGE_NOT_FOUND("입력한 페이지를 찾을 수 없습니다");
 
 
     private String description;

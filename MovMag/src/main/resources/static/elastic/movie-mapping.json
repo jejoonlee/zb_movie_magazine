@@ -28,7 +28,7 @@
     },
 
     "released_date": {
-      "type": "text"
+      "type": "date"
     },
 
     "movie_score": {

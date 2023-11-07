@@ -1,6 +1,6 @@
 package com.jejoonlee.movmag.app.movie.controller;
 
-import com.jejoonlee.movmag.app.elasticsearch.document.CastDocument;
+import com.jejoonlee.movmag.app.elasticsearch.dto.CastElsDto;
 import com.jejoonlee.movmag.app.elasticsearch.dto.MovieElsDto;
 import com.jejoonlee.movmag.app.elasticsearch.service.CastSearchService;
 import com.jejoonlee.movmag.app.elasticsearch.service.MovieSearchService;
@@ -60,15 +60,16 @@ public class MovieController {
 
     // all
     @GetMapping("")
-    public ResponseEntity<List<MovieElsDto.Response>> searchMovie(
+    public ResponseEntity<MovieElsDto.PageInfo> searchMovie(
             @RequestParam String movieName,
-            @RequestParam String lang
+            @RequestParam String lang,
+            @RequestParam int page
     ) {
-        return ResponseEntity.ok(movieSearchService.searchMovie(movieName, lang));
+        return ResponseEntity.ok(movieSearchService.searchMovie(movieName, lang, page));
     }
 
     @GetMapping("/cast")
-    public ResponseEntity<List<CastDocument>> searchMovieByCast(
+    public ResponseEntity<List<CastElsDto.Response>> searchMovieByCast(
             @RequestParam String name
     ){
         return ResponseEntity.ok(castSearchService.searchByCast(name));

@@ -4,7 +4,6 @@ import com.jejoonlee.movmag.app.elasticsearch.document.MovieDocument;
 import com.jejoonlee.movmag.app.elasticsearch.dto.MovieElsDto;
 import com.jejoonlee.movmag.app.elasticsearch.repository.MovieSearchRepository;
 import com.jejoonlee.movmag.app.elasticsearch.service.MovieSearchService;
-import com.jejoonlee.movmag.app.movie.domain.GenreEntity;
 import com.jejoonlee.movmag.app.movie.dto.GenreDto;
 import com.jejoonlee.movmag.app.movie.repository.GenreRepository;
 import com.jejoonlee.movmag.app.movie.repository.MovieRepository;
@@ -12,6 +11,7 @@ import com.jejoonlee.movmag.exception.ErrorCode;
 import com.jejoonlee.movmag.exception.MovieException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -43,22 +43,34 @@ public class MovieSearchServiceImpl implements MovieSearchService {
         return dataCount;
     }
 
-    private List<MovieElsDto.Response> getMovieList(String movieName, String lang){
+    private MovieElsDto.PageInfo getMovieList(String movieName, String lang, int page){
 
-        List<MovieDocument> movieDocumentList;
+        Page<MovieDocument> movieDocumentPage;
+        
         List<MovieElsDto.Response> result = new ArrayList<>();
 
+        // 입력한 페이지에 대한 영화 데이터 가지고 오기
         if (lang.equals("korean")) {
-            movieDocumentList =  movieSearchRepository.findAllByTitleKor(movieName);
+            movieDocumentPage =  movieSearchRepository
+                    .findAllByTitleKorOrderByReleasedDateDesc(movieName, PageRequest.of(page - 1, 10));
         } else if (lang.equals("english")) {
-            movieDocumentList = movieSearchRepository.findAllByTitleEng(movieName);
+            movieDocumentPage = movieSearchRepository
+                    .findAllByTitleEngOrderByReleasedDateDesc(movieName, PageRequest.of(page - 1, 10));
         } else {
             throw new MovieException(ErrorCode.WRONG_LANGUAGE);
         }
 
+        if (page <= 0 && page > movieDocumentPage.getTotalPages())
+            throw new MovieException(ErrorCode.PAGE_NOT_FOUND);
+
+        List<MovieDocument> movieDocumentList = movieDocumentPage.getContent();
+
         if (movieDocumentList.size() == 0)
             throw new MovieException(ErrorCode.NO_MOVIE_FOUND);
 
+        Long count = (Long.valueOf(page) - 1L) * 10 + 1L;
+
+        // 검색한 영화 데이터 저장하기 (장르는 ID말고 이름으로)
         for (int i = 0; i < movieDocumentList.size(); i++) {
 
             MovieDocument movie = movieDocumentList.get(i);
@@ -71,8 +83,7 @@ public class MovieSearchServiceImpl implements MovieSearchService {
             for (int num : genres) {
                 Long genreId = Long.valueOf(num);
 
-                GenreEntity genreEntity = genreRepository.findById(genreId).get();
-                GenreDto genreDto = GenreDto.fromEntity(genreEntity);
+                GenreDto genreDto = GenreDto.fromEntity(genreRepository.findById(genreId).get());
 
                 if (lang.equals("korean")) {
                     genre.add(genreDto.getGenreKor());
@@ -81,17 +92,22 @@ public class MovieSearchServiceImpl implements MovieSearchService {
                 }
             }
 
+            movieElsDto.setNumber(count ++);
             movieElsDto.setGenre(genre);
 
             result.add(movieElsDto);
         }
 
-        return result;
+        return MovieElsDto.PageInfo.builder()
+                .page(page)
+                .totalPage(movieDocumentPage.getTotalPages())
+                .foundDataNum(movieDocumentPage.getTotalElements())
+                .data(result)
+                .build();
     }
 
     @Override
-    public List<MovieElsDto.Response> searchMovie(String movieName, String lang) {
-
-        return getMovieList(movieName, lang);
+    public MovieElsDto.PageInfo searchMovie(String movieName, String lang, int page) {
+        return getMovieList(movieName, lang, page);
     }
 }
