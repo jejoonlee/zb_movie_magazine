@@ -11,15 +11,11 @@ import org.springframework.web.reactive.function.client.WebClient;
 @RequiredArgsConstructor
 @Service
 public class MovieExternalApiClient {
-    private static final WebClient webClient = WebClient.builder()
-            .baseUrl("https://api.themoviedb.org/3")
-            .defaultHeader(HttpHeaders.ACCEPT, "application/json")
-            .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(-1))
-            .build();
 
-    static MovieExternalApiDto.GenreList getGenre(String apiKey, String language) {
+    private final WebClient webClient;
 
-        MovieExternalApiDto.GenreList response = webClient.get()
+    public MovieExternalApiDto.GenreList getGenre(String apiKey, String language) {
+        return webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/genre/movie/list")
                         .queryParam("language", language)
@@ -28,13 +24,10 @@ public class MovieExternalApiClient {
                 .retrieve()
                 .bodyToMono(MovieExternalApiDto.GenreList.class)
                 .block();
-
-        return response;
     }
 
-    static MovieExternalApiDto.MovieList getMovieList(String apiKey, String language, String page) {
-
-        MovieExternalApiDto.MovieList response = webClient.get()
+    public MovieExternalApiDto.MovieList getMovieList(String apiKey, String language, String page) {
+        return webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/movie/popular")
                         .queryParam("language", language)
@@ -44,14 +37,11 @@ public class MovieExternalApiClient {
                 .retrieve()
                 .bodyToMono(MovieExternalApiDto.MovieList.class)
                 .block();
-
-        return response;
     }
 
     // 캐스트들 정보와 런타임 정보
-    static MovieExternalApiDto.MovieDetail getMovieDetail(String apiKey, Long movieId) {
-
-        MovieExternalApiDto.MovieDetail response = webClient.get()
+    public MovieExternalApiDto.MovieDetail getMovieDetail(String apiKey, Long movieId) {
+        return webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/movie/" + String.valueOf(movieId))
                         .queryParam("append_to_response", "credits")
@@ -60,7 +50,5 @@ public class MovieExternalApiClient {
                 .retrieve()
                 .bodyToMono(MovieExternalApiDto.MovieDetail.class)
                 .block();
-
-        return response;
     }
 }

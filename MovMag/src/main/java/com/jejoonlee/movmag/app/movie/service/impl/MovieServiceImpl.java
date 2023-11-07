@@ -311,7 +311,7 @@ public class MovieServiceImpl implements MovieService {
         saveGenre(genreListEng, genreListKor);
         log.info("Save Genre finish : {}", LocalDateTime.now());
 
-        int[] counts = saveMovies(apiKey, 99, 500);
+        int[] counts = saveMovies(apiKey, 1, 500);
 
         return UpdateMovie.Response.builder()
                 .message("DB에 저장된 영화와 캐스트. 이미 저장이 되어 있는 데이터일 수도 있습니다 (0이 나올시).")
