@@ -2,6 +2,7 @@ package com.jejoonlee.movmag.app.review.domain;
 
 import com.jejoonlee.movmag.app.member.domain.MemberEntity;
 import com.jejoonlee.movmag.app.movie.domain.MovieEntity;
+import com.jejoonlee.movmag.app.review.dto.ReviewRegister;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -50,5 +51,15 @@ public class ReviewEntity {
     @Column(name="updated_at")
     @LastModifiedDate
     private LocalDateTime updatedAt;
+
+    public static ReviewEntity updateEntity(ReviewEntity review, MovieEntity movie, ReviewRegister.Update update){
+        review.setMovieEntity(movie);
+        review.setReviewTitle(update.getReviewTitle());
+        review.setReviewOneline(update.getReviewOneline());
+        review.setMovieScore(update.getMovieScore());
+        review.setContent(update.getContent());
+
+        return review;
+    }
 
 }

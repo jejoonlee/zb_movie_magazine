@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -228,15 +229,16 @@ public class MovieServiceImpl implements MovieService {
 
                 Map<String, Object> movieIdMap = castDto.getMovieId();
 
-                Set<Long> movieIdSet = new HashSet<>();
-
                 ArrayList<Integer> movieIdList = (ArrayList<Integer>) movieIdMap.get("movieId");
 
-                for (int id : movieIdList) movieIdSet.add((long) id);
+                movieIdList.add(movieId.intValue());
 
-                movieIdSet.add(movieId);
+                List<Long> movieIdResult = movieIdList.stream()
+                        .map(id -> Long.valueOf(id))
+                        .distinct()
+                        .collect(Collectors.toList());
 
-                movieIdMap.put("movieId", new ArrayList<>(movieIdSet));
+                movieIdMap.put("movieId", movieIdResult);
 
                 castDto.setMovieId(movieIdMap);
             }

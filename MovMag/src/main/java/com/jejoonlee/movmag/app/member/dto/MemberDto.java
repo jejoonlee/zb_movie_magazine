@@ -1,6 +1,7 @@
 package com.jejoonlee.movmag.app.member.dto;
 
 import com.jejoonlee.movmag.app.member.domain.MemberEntity;
+import com.jejoonlee.movmag.app.member.domain.MemberRole;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -57,11 +58,11 @@ public class MemberDto implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> auth = new ArrayList<>();
 
-        if (this.role.equals("Editor")) {
+        if (this.role.equals(MemberRole.EDITOR.getValue())) {
             auth.add(new SimpleGrantedAuthority("ROLE_EDITOR"));
-        } else if (this.role.equals("User")) {
+        } else if (this.role.equals(MemberRole.USER.getValue())) {
             auth.add(new SimpleGrantedAuthority("ROLE_USER"));
-        } else if (this.role.equals("Admin")) {
+        } else if (this.role.equals(MemberRole.ADMIN.getValue())) {
             auth.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
         } else {
             throw new RuntimeException("없는 권한입니다");

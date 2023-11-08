@@ -15,7 +15,7 @@ public class AppConfig {
     }
 
     @Bean
-    public WebClient webClient() {
+    public WebClient tmdbApiWebClient() {
         return WebClient.builder()
                 .baseUrl("https://api.themoviedb.org/3")
                 .defaultHeader(HttpHeaders.ACCEPT, "application/json")
