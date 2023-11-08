@@ -18,7 +18,8 @@ public enum ErrorCode {
     USER_NOT_FOUND("없는 유저입니다"),
     EMAIL_EXISTS("이미 이메일이 존재합니다"),
     PASSWORD_NOT_MATCH("비밀번호가 일치하지 않습니다"),
-    USER_PERMISSION_NOT_GRANTED("해당 요청에 대한 권한이 없습니다. JWT 토큰을 헤더에 추가하거나, 다른 로그인 정보로 로그인해주세요"),
+    USER_PERMISSION_NOT_GRANTED("로그인이 필요한 서비스이거나, 해당 요청에 대한 권한이 없습니다. JWT 토큰을 헤더에 추가하거나, 다른 로그인 정보로 로그인해주세요"),
+    USER_NOT_LOGGED_IN("로그인을 해주세요"),
 
     // 영화 업데이트 에러 코드
     MOVIE_NOT_FOUND("영화를 찾을 수 없습니다"),
@@ -68,7 +69,11 @@ public enum ErrorCode {
     TMDB_ID_INVALID("ID가 잘못되었습니다"),
     TMDB_SUSPENDED_USER("이 사용자는 중지되었습니다"),
     TMDB_API_UNDER_MAINTENANCE("api가 보수 중에 있습니다"),
-    TMDB_INVALID_INPUT("입력하신 값이 유효하지 않습니다");
+    TMDB_INVALID_INPUT("입력하신 값이 유효하지 않습니다"),
+
+    // 리뷰 관련 에러
+    REVIEW_NOT_FOUND("리뷰를 찾을 수 없습니다"),
+    LOGGED_IN_USER_AND_AUTHOR_UNMATCH("리뷰를 쓴 사람과, 로그인한 유저가 다릅니다");
 
 
     private String description;

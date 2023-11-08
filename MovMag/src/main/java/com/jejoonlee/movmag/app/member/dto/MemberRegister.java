@@ -20,7 +20,8 @@ public class MemberRegister {
     public static class Request {
 
         @NotBlank(message="이메일은 필수 입력 사항입니다")
-        @Email(message="이메일 형식에 맞지 않습니다")
+        @Email(message="이메일 형식에 맞지 않습니다",
+        regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,6}$")
         private String email;
 
         @NotBlank(message="회원 이름은 필수 입력 사항입니다")

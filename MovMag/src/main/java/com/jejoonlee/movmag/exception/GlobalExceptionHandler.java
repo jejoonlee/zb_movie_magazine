@@ -34,6 +34,14 @@ public class GlobalExceptionHandler {
                 ErrorResponse.getErrorCode(e.getErrorCode()));
     }
 
+    @ExceptionHandler(ReviewException.class)
+    public ResponseEntity<ErrorResponse> handleReviewException(ReviewException e) {
+        log.error("{} has occurred.", e.getErrorCode());
+
+        return ResponseEntity.badRequest().body(
+                ErrorResponse.getErrorCode(e.getErrorCode()));
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         log.error("MethodArgumentNotValidException : " + e.getMessage());

@@ -40,6 +40,19 @@ public class MemberDto implements UserDetails {
                 .build();
     }
 
+    public static MemberEntity toEntity(MemberDto memberDto) {
+        return MemberEntity.builder()
+                .memberId(memberDto.getMemberId())
+                .email(memberDto.getEmail())
+                .username(memberDto.getUsername())
+                .password(memberDto.getPassword())
+                .phoneNum(memberDto.getPhoneNum())
+                .role(memberDto.getRole())
+                .registeredAt(memberDto.getRegisteredAt())
+                .updatedAt(memberDto.getUpdatedAt())
+                .build();
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> auth = new ArrayList<>();
