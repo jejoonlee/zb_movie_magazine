@@ -2,6 +2,7 @@ package com.jejoonlee.movmag.app.review.controller;
 
 import com.jejoonlee.movmag.app.review.dto.ReviewDelete;
 import com.jejoonlee.movmag.app.review.dto.ReviewDetail;
+import com.jejoonlee.movmag.app.review.dto.ReviewLikeResponse;
 import com.jejoonlee.movmag.app.review.dto.ReviewRegister;
 import com.jejoonlee.movmag.app.review.service.ReviewService;
 import lombok.RequiredArgsConstructor;
@@ -64,8 +65,18 @@ public class ReviewController {
         return reviewService.deleteReview(reviewId, authentication);
     }
 
+    // ================================== 새로 추가 ==================================
+
     // 리뷰 좋아요 or 취소
     // http://localhost:8080/review/like/{review_id}/{user_id}
+    @GetMapping("like")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_EDITOR', 'ROLE_USER')")
+    public ReviewLikeResponse likeReview(
+            @RequestParam Long reviewId,
+            Authentication authentication
+    ) {
+        return reviewService.likeReview(reviewId, authentication);
+    }
 
     // 인기 리뷰
     // http://localhost:8080/review/popular

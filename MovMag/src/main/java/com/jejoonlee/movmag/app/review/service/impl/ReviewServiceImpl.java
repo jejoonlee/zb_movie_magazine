@@ -1,14 +1,14 @@
 package com.jejoonlee.movmag.app.review.service.impl;
 
+import com.jejoonlee.movmag.app.member.domain.MemberEntity;
 import com.jejoonlee.movmag.app.member.domain.MemberRole;
 import com.jejoonlee.movmag.app.member.dto.MemberDto;
 import com.jejoonlee.movmag.app.movie.domain.MovieEntity;
 import com.jejoonlee.movmag.app.movie.repository.MovieRepository;
+import com.jejoonlee.movmag.app.review.domain.LikeEntity;
 import com.jejoonlee.movmag.app.review.domain.ReviewEntity;
-import com.jejoonlee.movmag.app.review.dto.ReviewDelete;
-import com.jejoonlee.movmag.app.review.dto.ReviewDetail;
-import com.jejoonlee.movmag.app.review.dto.ReviewDto;
-import com.jejoonlee.movmag.app.review.dto.ReviewRegister;
+import com.jejoonlee.movmag.app.review.dto.*;
+import com.jejoonlee.movmag.app.review.repository.ReviewLikeRepository;
 import com.jejoonlee.movmag.app.review.repository.ReviewRepository;
 import com.jejoonlee.movmag.app.review.repository.response.MovieScore;
 import com.jejoonlee.movmag.app.review.service.ReviewService;
@@ -30,6 +30,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     private final MovieRepository movieRepository;
     private final ReviewRepository reviewRepository;
+    private final ReviewLikeRepository reviewLikeRepository;
 
 
     private MovieEntity getMovieEntity(Long movieId){
@@ -164,5 +165,51 @@ public class ReviewServiceImpl implements ReviewService {
                 .author(reviewEntity.getMemberEntity().getUsername())
                 .message("정상적으로 삭제를 했습니다")
                 .build();
+    }
+
+    // ================================== 새로 추가 ==================================
+
+    private boolean likeOrCancelLike(ReviewEntity reviewEntity, MemberEntity memberEntity) {
+
+        LikeEntity likeEntity = reviewLikeRepository.findByReviewEntityAndMemberEntity(reviewEntity, memberEntity);
+
+        // 현재 로그인 한 사람이 리뷰에 좋아요를 안 누른 상태면, LikeEntity에 저장한다
+        // else 현재 로그인 한 사람이 이미 리뷰에 좋아요를 눌렀다면, LikeEntity에서 좋아요를 삭제한다
+
+        if (likeEntity == null) {
+            likeEntity = ReviewLikeDto.toEntity(ReviewLikeDto.builder()
+                    .reviewEntity(reviewEntity)
+                    .memberEntity(memberEntity)
+                    .build());
+
+            reviewLikeRepository.save(likeEntity);
+
+            return true;
+        } else {
+            reviewLikeRepository.delete(likeEntity);
+            return false;
+        }
+    }
+
+    @Override
+    public ReviewLikeResponse likeReview(Long reviewId, Authentication authentication) {
+
+        // Param에 불러온 리뷰가 존재하는지 확인한다
+        ReviewEntity reviewEntity = getReviewEntity(reviewId);
+
+        // MemeberEntity 가지고 오기
+        MemberEntity memberEntity = MemberDto.toEntity((MemberDto) authentication.getPrincipal());
+
+        boolean shouldLikeOrCancel = likeOrCancelLike(reviewEntity, memberEntity);
+
+        if (shouldLikeOrCancel) {
+            return ReviewLikeResponse.builder()
+                    .message("좋아요를 눌렀습니다")
+                    .build();
+        } else {
+            return ReviewLikeResponse.builder()
+                    .message("좋아요를 취소했습니다")
+                    .build();
+        }
     }
 }
