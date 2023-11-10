@@ -11,6 +11,7 @@ import com.jejoonlee.movmag.app.review.dto.*;
 import com.jejoonlee.movmag.app.review.repository.ReviewLikeRepository;
 import com.jejoonlee.movmag.app.review.repository.ReviewRepository;
 import com.jejoonlee.movmag.app.review.repository.response.MovieScore;
+import com.jejoonlee.movmag.app.review.repository.response.PopularReview;
 import com.jejoonlee.movmag.app.review.service.ReviewService;
 import com.jejoonlee.movmag.exception.ErrorCode;
 import com.jejoonlee.movmag.exception.MovieException;
@@ -21,7 +22,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -211,5 +214,20 @@ public class ReviewServiceImpl implements ReviewService {
                     .message("좋아요를 취소했습니다")
                     .build();
         }
+    }
+
+    private List<ReviewPopular> getPopularReviewResult(){
+
+        List<PopularReview> popularReviews = reviewRepository.findTop10PopularReviewByReviewLike();
+
+        return popularReviews.stream()
+                .map(pr -> new ReviewPopular(pr.getCount(),
+                        ReviewRegister.Response.fromEntity(reviewRepository.findById(pr.getReview()).orElse(null))))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ReviewPopular> getPopularReviews() {
+        return getPopularReviewResult();
     }
 }

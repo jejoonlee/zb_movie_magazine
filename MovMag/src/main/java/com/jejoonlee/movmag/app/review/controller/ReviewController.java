@@ -1,9 +1,6 @@
 package com.jejoonlee.movmag.app.review.controller;
 
-import com.jejoonlee.movmag.app.review.dto.ReviewDelete;
-import com.jejoonlee.movmag.app.review.dto.ReviewDetail;
-import com.jejoonlee.movmag.app.review.dto.ReviewLikeResponse;
-import com.jejoonlee.movmag.app.review.dto.ReviewRegister;
+import com.jejoonlee.movmag.app.review.dto.*;
 import com.jejoonlee.movmag.app.review.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -11,6 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/review")
@@ -69,7 +67,7 @@ public class ReviewController {
 
     // 리뷰 좋아요 or 취소
     // http://localhost:8080/review/like/{review_id}/{user_id}
-    @GetMapping("like")
+    @GetMapping("/like")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_EDITOR', 'ROLE_USER')")
     public ReviewLikeResponse likeReview(
             @RequestParam Long reviewId,
@@ -80,6 +78,12 @@ public class ReviewController {
 
     // 인기 리뷰
     // http://localhost:8080/review/popular
+    @GetMapping("/popular")
+    public List<ReviewPopular> getPopular(
+    ) {
+        return reviewService.getPopularReviews();
+    }
+
 
     // 리뷰 찾기, 리뷰를 쓴 유저 (elasticsearch)
     // http://localhost:8080/review?user={keyword}

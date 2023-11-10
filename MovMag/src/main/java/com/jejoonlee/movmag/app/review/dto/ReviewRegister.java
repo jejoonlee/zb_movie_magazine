@@ -4,6 +4,7 @@ import com.jejoonlee.movmag.app.review.domain.ReviewEntity;
 import lombok.*;
 
 import javax.validation.constraints.*;
+import java.time.LocalDateTime;
 
 public class ReviewRegister {
 
@@ -69,12 +70,20 @@ public class ReviewRegister {
         private Long reviewId;
         private String reviewTitle;
         private String author;
+        private String reviewOneline;
+        private Double movieScore;
+        private LocalDateTime registeredAt;
+        private LocalDateTime updatedAt;
 
         public static Response fromEntity(ReviewEntity reviewEntity){
             return Response.builder()
                     .reviewId(reviewEntity.getReviewId())
                     .reviewTitle(reviewEntity.getReviewTitle())
                     .author(reviewEntity.getMemberEntity().getUsername())
+                    .reviewOneline(reviewEntity.getReviewOneline())
+                    .movieScore(reviewEntity.getMovieScore())
+                    .registeredAt(reviewEntity.getRegisteredAt())
+                    .updatedAt(reviewEntity.getUpdatedAt())
                     .build();
         }
     }

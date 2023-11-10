@@ -1,10 +1,9 @@
 package com.jejoonlee.movmag.app.review.service;
 
-import com.jejoonlee.movmag.app.review.dto.ReviewDelete;
-import com.jejoonlee.movmag.app.review.dto.ReviewDetail;
-import com.jejoonlee.movmag.app.review.dto.ReviewLikeResponse;
-import com.jejoonlee.movmag.app.review.dto.ReviewRegister;
+import com.jejoonlee.movmag.app.review.dto.*;
 import org.springframework.security.core.Authentication;
+
+import java.util.List;
 
 public interface ReviewService {
 
@@ -18,4 +17,6 @@ public interface ReviewService {
 
     // ================================== 새로 추가 ==================================
     ReviewLikeResponse likeReview(Long reviewId, Authentication authentication);
+
+    List<ReviewPopular> getPopularReviews();
 }
