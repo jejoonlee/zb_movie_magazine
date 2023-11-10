@@ -1,5 +1,6 @@
 package com.jejoonlee.movmag.app.review.service.impl;
 
+import com.jejoonlee.movmag.app.elasticsearch.service.ReviewSearchService;
 import com.jejoonlee.movmag.app.member.domain.MemberEntity;
 import com.jejoonlee.movmag.app.member.domain.MemberRole;
 import com.jejoonlee.movmag.app.member.dto.MemberDto;
@@ -22,7 +23,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,6 +34,7 @@ public class ReviewServiceImpl implements ReviewService {
     private final MovieRepository movieRepository;
     private final ReviewRepository reviewRepository;
     private final ReviewLikeRepository reviewLikeRepository;
+    private final ReviewSearchService reviewSearchService;
 
 
     private MovieEntity getMovieEntity(Long movieId){
@@ -97,6 +98,10 @@ public class ReviewServiceImpl implements ReviewService {
         // 해당 리뷰 저장
         reviewRepository.save(reviewEntity);
 
+        // 엘라스틱 서치에 저장
+        reviewSearchService.saveToReviewDocument(ReviewDetail.fromEntity(reviewEntity));
+        log.info("리뷰 정보 엘라스틱 서치에 저장 성공");
+
         // 해당 영화에 대한 리뷰에서 평가한 점수를 평균 점수로 만들어서
         // 가져온 영화 entity 점수에 저장
         movie.setMovieScore(getMovieScoreAvg(movie));
@@ -112,22 +117,7 @@ public class ReviewServiceImpl implements ReviewService {
         // 리뷰가 존재하는지 확인
         ReviewEntity reviewEntity = getReviewEntity(reviewId);
 
-        String movieTitleEng = reviewEntity.getMovieEntity().getTitleEng();
-        String movieTitleKor = reviewEntity.getMovieEntity().getTitleKor();
-        String author = reviewEntity.getMemberEntity().getUsername();
-
-        return ReviewDetail.builder()
-                .reviewId(reviewEntity.getReviewId())
-                .movieTitleEng(movieTitleEng)
-                .movieTitleKor(movieTitleKor)
-                .movieScore(reviewEntity.getMovieScore())
-                .author(author)
-                .reviewTitle(reviewEntity.getReviewTitle())
-                .reviewOneline(reviewEntity.getReviewOneline())
-                .content(reviewEntity.getContent())
-                .registeredAt(reviewEntity.getRegisteredAt())
-                .updatedAt(reviewEntity.getUpdatedAt())
-                .build();
+        return ReviewDetail.fromEntity(reviewEntity);
     }
 
     @Override

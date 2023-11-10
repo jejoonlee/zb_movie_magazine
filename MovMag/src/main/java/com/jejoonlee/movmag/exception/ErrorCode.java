@@ -73,7 +73,8 @@ public enum ErrorCode {
 
     // 리뷰 관련 에러
     REVIEW_NOT_FOUND("리뷰를 찾을 수 없습니다"),
-    LOGGED_IN_USER_AND_AUTHOR_UNMATCH("리뷰를 쓴 사람과, 로그인한 유저가 다릅니다");
+    LOGGED_IN_USER_AND_AUTHOR_UNMATCH("리뷰를 쓴 사람과, 로그인한 유저가 다릅니다"),
+    SAVE_TO_ELASTICSEARCH_UNSUCCESSFUL("엘라스틱서치에 저장하는 것을 실패했습니다");
 
 
     private String description;

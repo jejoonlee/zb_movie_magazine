@@ -1,0 +1,38 @@
+{
+  "properties": {
+
+    "reviewId": {
+      "type": "keyword"
+    },
+
+    "movieTitleEng": {
+      "type" : "text"
+    },
+
+    "movieTitleKor": {
+      "type": "text",
+      "analyzer": "korean"
+    },
+
+    "author": {
+      "type": "text"
+    },
+
+    "reviewTitle": {
+      "type": "text"
+    },
+
+    "reviewOneline": {
+      "type": "text"
+    },
+
+    "movieScore": {
+      "type": "double"
+    },
+
+    "updated_at": {
+      "type": "date",
+      "format" : "YYYY-MM-DD'T'HH:mm:ssZ"
+    }
+  }
+}
