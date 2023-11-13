@@ -83,7 +83,7 @@ public class MovieSearchServiceImpl implements MovieSearchService {
             for (int num : genres) {
                 Long genreId = Long.valueOf(num);
 
-                GenreDto genreDto = GenreDto.fromEntity(genreRepository.findById(genreId).get());
+                GenreDto genreDto = GenreDto.fromEntity(genreRepository.getOne(genreId));
 
                 if (lang.equals("korean")) {
                     genre.add(genreDto.getGenreKor());

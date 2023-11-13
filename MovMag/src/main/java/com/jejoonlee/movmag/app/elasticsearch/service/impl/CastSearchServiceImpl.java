@@ -4,6 +4,7 @@ import com.jejoonlee.movmag.app.elasticsearch.document.CastDocument;
 import com.jejoonlee.movmag.app.elasticsearch.dto.CastElsDto;
 import com.jejoonlee.movmag.app.elasticsearch.repository.CastSearchRepository;
 import com.jejoonlee.movmag.app.elasticsearch.service.CastSearchService;
+import com.jejoonlee.movmag.app.movie.domain.MovieEntity;
 import com.jejoonlee.movmag.app.movie.dto.MovieDto;
 import com.jejoonlee.movmag.app.movie.repository.CastRepository;
 import com.jejoonlee.movmag.app.movie.repository.MovieRepository;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -75,12 +77,11 @@ public class CastSearchServiceImpl implements CastSearchService {
             for (int num : movieIds) {
                 Long movieId = Long.valueOf(num);
 
-                if (movieRepository.existsById(movieId)) {
+                Optional<MovieEntity> movieEntity = movieRepository.findById(movieId);
 
-                    MovieDto movieDto = MovieDto.fromEntity(movieRepository.findById(movieId).get());
-
+                if (movieEntity.isPresent()) {
+                    MovieDto movieDto = MovieDto.fromEntity(movieEntity.get());
                     CastElsDto.Movie castMovie = CastElsDto.Movie.fromMovieDto(movieDto);
-
                     featuredMovies.add(castMovie);
                 }
             }
