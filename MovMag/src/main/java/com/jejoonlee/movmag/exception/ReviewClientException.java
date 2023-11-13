@@ -7,12 +7,14 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ReviewException extends RuntimeException{
+public class ReviewClientException extends RuntimeException{
     private ErrorCode errorCode;
     private String errorMessage;
+    private int errorNum;
 
-    public ReviewException(ErrorCode errorCode) {
+    public ReviewClientException(ErrorCode errorCode) {
         this.errorCode = errorCode;
         this.errorMessage = errorCode.getDescription();
+        this.errorNum = errorCode.getErrorNum();
     }
 }

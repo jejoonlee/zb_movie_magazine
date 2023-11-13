@@ -10,9 +10,11 @@ import lombok.*;
 public class MemberException extends RuntimeException{
     private ErrorCode errorCode;
     private String errorMessage;
+    private int errorNum;
 
     public MemberException(ErrorCode errorCode) {
         this.errorCode = errorCode;
         this.errorMessage = errorCode.getDescription();
+        this.errorNum = errorCode.getErrorNum();
     }
 }

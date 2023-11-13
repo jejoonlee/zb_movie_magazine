@@ -19,11 +19,21 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static HttpStatus getHttpStatus(int num){
+        if (num == 4) {
+            return HttpStatus.BAD_REQUEST;
+        } else if (num == 5) {
+            return HttpStatus.INTERNAL_SERVER_ERROR;
+        } else {
+            return HttpStatus.UNAUTHORIZED; // 6일 때
+        }
+    }
+
     @ExceptionHandler(MemberException.class)
     public ResponseEntity<ErrorResponse> handleMemberException(MemberException e) {
         log.error("{} has occurred.", e.getErrorCode());
 
-        return ResponseEntity.badRequest().body(
+        return ResponseEntity.status(getHttpStatus(e.getErrorNum())).body(
                 ErrorResponse.getErrorCode(e.getErrorCode()));
     }
 
@@ -31,15 +41,15 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleMovieException(MovieException e) {
         log.error("{} has occurred.", e.getErrorCode());
 
-        return ResponseEntity.badRequest().body(
+        return ResponseEntity.status(getHttpStatus(e.getErrorNum())).body(
                 ErrorResponse.getErrorCode(e.getErrorCode()));
     }
 
-    @ExceptionHandler(ReviewException.class)
-    public ResponseEntity<ErrorResponse> handleReviewException(ReviewException e) {
+    @ExceptionHandler(ReviewClientException.class)
+    public ResponseEntity<ErrorResponse> handleReviewException(ReviewClientException e) {
         log.error("{} has occurred.", e.getErrorCode());
 
-        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(
+        return ResponseEntity.status(getHttpStatus(e.getErrorNum())).body(
                 ErrorResponse.getErrorCode(e.getErrorCode()));
     }
 
@@ -68,7 +78,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException e) {
         log.error("AccessDeniedException has occurred: " + e.getMessage(), e);
 
-        return ResponseEntity.badRequest().body(
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                 ErrorResponse.getErrorCode(ErrorCode.USER_PERMISSION_NOT_GRANTED));
     }
 

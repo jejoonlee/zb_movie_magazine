@@ -16,7 +16,7 @@ import com.jejoonlee.movmag.app.review.repository.response.PopularReview;
 import com.jejoonlee.movmag.app.review.service.ReviewService;
 import com.jejoonlee.movmag.exception.ErrorCode;
 import com.jejoonlee.movmag.exception.MovieException;
-import com.jejoonlee.movmag.exception.ReviewException;
+import com.jejoonlee.movmag.exception.ReviewClientException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -44,7 +44,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     private ReviewEntity getReviewEntity(Long reviewId){
         return reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new ReviewException(ErrorCode.REVIEW_NOT_FOUND));
+                .orElseThrow(() -> new ReviewClientException(ErrorCode.REVIEW_NOT_FOUND));
     }
 
     private double getMovieScoreAvg(MovieEntity movie){
@@ -65,7 +65,7 @@ public class ReviewServiceImpl implements ReviewService {
         // Admin은 모든 글을 수정할 수 있다
         if (currentUser.getRole().equals(MemberRole.EDITOR.getValue()) &&
                 currentUser.getMemberId() != review.getMemberEntity().getMemberId()) {
-            throw new ReviewException(ErrorCode.LOGGED_IN_USER_AND_AUTHOR_UNMATCH);
+            throw new ReviewClientException(ErrorCode.LOGGED_IN_USER_AND_AUTHOR_UNMATCH);
         }
 
         return review;

@@ -10,9 +10,11 @@ import lombok.*;
 public class MovieException extends RuntimeException{
     private ErrorCode errorCode;
     private String errorMessage;
+    private int errorNum;
 
     public MovieException(ErrorCode errorCode) {
         this.errorCode = errorCode;
         this.errorMessage = errorCode.getDescription();
+        this.errorNum = errorCode.getErrorNum();
     }
 }
