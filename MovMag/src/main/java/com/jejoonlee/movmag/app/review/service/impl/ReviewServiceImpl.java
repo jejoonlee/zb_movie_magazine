@@ -151,6 +151,8 @@ public class ReviewServiceImpl implements ReviewService {
         // 로그인한 사람이 현재 리뷰를 수정할 수 있는 권한이 있는지 확인
         ReviewEntity reviewEntity = checkAvailabilityToChangeReview(member, reviewId);
 
+        reviewSearchService.deleteFromReviewDocument(ReviewDetail.fromEntity(reviewEntity));
+
         reviewRepository.delete(reviewEntity);
 
         return ReviewDelete.Response.builder()
