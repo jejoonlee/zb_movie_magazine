@@ -2,8 +2,9 @@ package com.jejoonlee.movmag.app.elasticsearch.document;
 
 import com.jejoonlee.movmag.app.review.dto.ReviewDetail;
 import lombok.*;
-import org.springframework.data.elasticsearch.annotations.*;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.*;
+
 import java.time.LocalDateTime;
 
 @Getter
@@ -38,7 +39,7 @@ public class ReviewDocument {
     @Field(name = "movie_score", type = FieldType.Double)
     private Double movieScore;
 
-    @Field(name = "updated_at", type = FieldType.Date, format = DateFormat.custom, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
+    @Field(name = "updated_at", type = FieldType.Date, format={DateFormat.date_hour_minute_second_millis, DateFormat.epoch_millis})
     private LocalDateTime updatedAt;
 
     public static ReviewDocument fromReviewDetail(ReviewDetail reviewDetail) {

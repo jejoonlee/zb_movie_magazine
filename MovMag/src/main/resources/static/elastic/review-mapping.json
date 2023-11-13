@@ -32,7 +32,8 @@
 
     "updated_at": {
       "type": "date",
-      "format" : "YYYY-MM-DD'T'HH:mm:ssZ"
+      "format": "uuuu-MM-dd'T'HH:mm:ss.SSS||epoch_millis"
+
     }
   }
 }
