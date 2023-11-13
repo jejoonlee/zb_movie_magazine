@@ -132,8 +132,11 @@ public class ReviewServiceImpl implements ReviewService {
         MovieEntity movie = movieRepository.findById(update.getMovieId())
                 .orElseThrow(()->new MovieException(ErrorCode.MOVIE_NOT_FOUND));
 
+        review = ReviewEntity.updateEntity(review, movie, update);
 
-        reviewRepository.save(ReviewEntity.updateEntity(review, movie, update));
+        reviewRepository.save(review);
+
+        reviewSearchService.updateFromReviewDocument(ReviewDetail.fromEntity(review));
 
         movie.setMovieScore(getMovieScoreAvg(movie));
         movieRepository.save(movie);
@@ -151,6 +154,7 @@ public class ReviewServiceImpl implements ReviewService {
         // 로그인한 사람이 현재 리뷰를 수정할 수 있는 권한이 있는지 확인
         ReviewEntity reviewEntity = checkAvailabilityToChangeReview(member, reviewId);
 
+        // 엘라스틱 서치에서 먼저 삭제를 하기
         reviewSearchService.deleteFromReviewDocument(ReviewDetail.fromEntity(reviewEntity));
 
         reviewRepository.delete(reviewEntity);

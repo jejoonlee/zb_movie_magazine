@@ -8,6 +8,7 @@ import org.springframework.data.elasticsearch.annotations.*;
 import java.time.LocalDateTime;
 
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -53,5 +54,16 @@ public class ReviewDocument {
                 .movieScore(reviewDetail.getMovieScore())
                 .updatedAt(reviewDetail.getUpdatedAt())
                 .build();
+    }
+
+    public static ReviewDocument updateReviewDetail(ReviewDocument reviewDocument, ReviewDetail reviewDetail){
+        reviewDocument.setMovieScore(reviewDetail.getMovieScore());
+        reviewDocument.setMovieTitleEng(reviewDetail.getMovieTitleEng());
+        reviewDocument.setMovieTitleKor(reviewDetail.getMovieTitleKor());
+        reviewDocument.setReviewTitle(reviewDetail.getReviewTitle());
+        reviewDocument.setReviewOneline(reviewDetail.getReviewOneline());
+        reviewDocument.setUpdatedAt(reviewDetail.getUpdatedAt());
+
+        return reviewDocument;
     }
 }
