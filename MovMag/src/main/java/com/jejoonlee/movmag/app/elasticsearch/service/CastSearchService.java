@@ -1,12 +1,10 @@
 package com.jejoonlee.movmag.app.elasticsearch.service;
 
-import com.jejoonlee.movmag.app.elasticsearch.document.CastDocument;
-
-import java.util.List;
+import com.jejoonlee.movmag.app.elasticsearch.dto.CastElsDto;
 
 public interface CastSearchService {
 
     Long saveAllCastsToCastDocument();
 
-    List<CastDocument> searchByCast(String name);
+    CastElsDto.Page searchByCast(String name, int page);
 }
