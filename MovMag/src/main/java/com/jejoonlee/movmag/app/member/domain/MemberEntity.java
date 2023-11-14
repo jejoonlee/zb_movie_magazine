@@ -34,8 +34,9 @@ public class MemberEntity {
     @Column(name="phone_number", nullable = false, length = 20)
     private String phoneNum;
 
+    @Enumerated(EnumType.STRING)
     @Column(name="role", nullable = false, length = 10)
-    private String role;
+    private MemberRole role;
 
     @Column(name="registered_at", nullable = false)
     @CreatedDate

@@ -24,7 +24,7 @@ public class MemberDto implements UserDetails {
     private String username;
     private String password;
     private String phoneNum;
-    private String role;
+    private MemberRole role;
     private LocalDateTime registeredAt;
     private LocalDateTime updatedAt;
 
@@ -58,11 +58,11 @@ public class MemberDto implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> auth = new ArrayList<>();
 
-        if (this.role.equals(MemberRole.EDITOR.getValue())) {
+        if (this.role == MemberRole.EDITOR) {
             auth.add(new SimpleGrantedAuthority("ROLE_EDITOR"));
-        } else if (this.role.equals(MemberRole.USER.getValue())) {
+        } else if (this.role == MemberRole.USER) {
             auth.add(new SimpleGrantedAuthority("ROLE_USER"));
-        } else if (this.role.equals(MemberRole.ADMIN.getValue())) {
+        } else if (this.role == MemberRole.ADMIN) {
             auth.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
         } else {
             throw new RuntimeException("없는 권한입니다");

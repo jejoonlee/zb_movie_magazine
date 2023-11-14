@@ -1,5 +1,6 @@
 package com.jejoonlee.movmag.app.member.security;
 
+import com.jejoonlee.movmag.app.member.domain.MemberRole;
 import com.jejoonlee.movmag.app.member.service.impl.MemberServiceImpl;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -28,7 +29,7 @@ public class TokenProvider {
     private String secretKey;
 
     // 토큰 생성 매서드
-    public String generateToken(Long memberId, String email, String role) {
+    public String generateToken(Long memberId, String email, MemberRole role) {
         Claims claims = Jwts.claims().setSubject(email);
         claims.put(MEMBER_ID, memberId);
         claims.put(KEY_ROLES, role); // key value로 저장

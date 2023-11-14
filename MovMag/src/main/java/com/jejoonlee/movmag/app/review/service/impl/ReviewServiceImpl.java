@@ -14,6 +14,7 @@ import com.jejoonlee.movmag.app.review.repository.ReviewRepository;
 import com.jejoonlee.movmag.app.review.repository.response.MovieScore;
 import com.jejoonlee.movmag.app.review.repository.response.PopularReview;
 import com.jejoonlee.movmag.app.review.service.ReviewService;
+import com.jejoonlee.movmag.app.review.type.LikeOrCancel;
 import com.jejoonlee.movmag.exception.ErrorCode;
 import com.jejoonlee.movmag.exception.MovieException;
 import com.jejoonlee.movmag.exception.ReviewClientException;
@@ -168,7 +169,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     // ================================== 새로 추가 ==================================
 
-    private boolean likeOrCancelLike(ReviewEntity reviewEntity, MemberEntity memberEntity) {
+    private LikeOrCancel likeOrCancelLike(ReviewEntity reviewEntity, MemberEntity memberEntity) {
 
         LikeEntity likeEntity = reviewLikeRepository.findByReviewEntityAndMemberEntity(reviewEntity, memberEntity);
 
@@ -183,10 +184,10 @@ public class ReviewServiceImpl implements ReviewService {
 
             reviewLikeRepository.save(likeEntity);
 
-            return true;
+            return LikeOrCancel.ClickLike;
         } else {
             reviewLikeRepository.delete(likeEntity);
-            return false;
+            return LikeOrCancel.CancelLIke;
         }
     }
 
@@ -199,9 +200,9 @@ public class ReviewServiceImpl implements ReviewService {
         // MemeberEntity 가지고 오기
         MemberEntity memberEntity = MemberDto.toEntity((MemberDto) authentication.getPrincipal());
 
-        boolean shouldLikeOrCancel = likeOrCancelLike(reviewEntity, memberEntity);
+        LikeOrCancel shouldLikeOrCancel = likeOrCancelLike(reviewEntity, memberEntity);
 
-        if (shouldLikeOrCancel) {
+        if (shouldLikeOrCancel == LikeOrCancel.ClickLike) {
             return ReviewLikeResponse.builder()
                     .message("좋아요를 눌렀습니다")
                     .build();

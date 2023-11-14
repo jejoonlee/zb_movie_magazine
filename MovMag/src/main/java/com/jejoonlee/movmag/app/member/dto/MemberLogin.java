@@ -1,5 +1,6 @@
 package com.jejoonlee.movmag.app.member.dto;
 
+import com.jejoonlee.movmag.app.member.domain.MemberRole;
 import lombok.*;
 
 import javax.validation.constraints.Email;
@@ -31,7 +32,7 @@ public class MemberLogin {
 
         private Long memberId;
         private String email;
-        private String role;
+        private MemberRole role;
 
         public static MemberLogin.Response fromDto(MemberDto memberDto) {
             return Response.builder()
