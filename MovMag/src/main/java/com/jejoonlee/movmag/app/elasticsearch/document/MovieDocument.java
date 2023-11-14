@@ -53,13 +53,16 @@ public class MovieDocument {
 
     public static MovieDocument fromEntity(MovieEntity movieEntity) {
 
+        // 영화 개봉 날짜가 없을 때 사용 (영화 역사상 첫 영화 개봉 날짜)
+        String firstEverMovieReleased = "1895-12-28";
+
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate releasedDate;
 
         if (!movieEntity.getReleasedDate().equals("")) {
             releasedDate = LocalDate.parse(movieEntity.getReleasedDate(), dtf);
         } else {
-            releasedDate = LocalDate.parse("1895-12-28", dtf);
+            releasedDate = LocalDate.parse(firstEverMovieReleased, dtf);
         }
 
         return MovieDocument.builder()
