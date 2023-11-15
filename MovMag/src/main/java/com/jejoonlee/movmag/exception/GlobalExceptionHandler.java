@@ -2,6 +2,7 @@ package com.jejoonlee.movmag.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
@@ -18,11 +19,21 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static HttpStatus getHttpStatus(int num){
+        if (num == 4) {
+            return HttpStatus.BAD_REQUEST;
+        } else if (num == 5) {
+            return HttpStatus.INTERNAL_SERVER_ERROR;
+        } else {
+            return HttpStatus.UNAUTHORIZED; // 6일 때
+        }
+    }
+
     @ExceptionHandler(MemberException.class)
     public ResponseEntity<ErrorResponse> handleMemberException(MemberException e) {
         log.error("{} has occurred.", e.getErrorCode());
 
-        return ResponseEntity.badRequest().body(
+        return ResponseEntity.status(getHttpStatus(e.getErrorNum())).body(
                 ErrorResponse.getErrorCode(e.getErrorCode()));
     }
 
@@ -30,7 +41,15 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleMovieException(MovieException e) {
         log.error("{} has occurred.", e.getErrorCode());
 
-        return ResponseEntity.badRequest().body(
+        return ResponseEntity.status(getHttpStatus(e.getErrorNum())).body(
+                ErrorResponse.getErrorCode(e.getErrorCode()));
+    }
+
+    @ExceptionHandler(ReviewClientException.class)
+    public ResponseEntity<ErrorResponse> handleReviewException(ReviewClientException e) {
+        log.error("{} has occurred.", e.getErrorCode());
+
+        return ResponseEntity.status(getHttpStatus(e.getErrorNum())).body(
                 ErrorResponse.getErrorCode(e.getErrorCode()));
     }
 
@@ -59,7 +78,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException e) {
         log.error("AccessDeniedException has occurred: " + e.getMessage(), e);
 
-        return ResponseEntity.badRequest().body(
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                 ErrorResponse.getErrorCode(ErrorCode.USER_PERMISSION_NOT_GRANTED));
     }
 

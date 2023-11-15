@@ -1,11 +1,11 @@
 package com.jejoonlee.movmag.config;
 
-import com.jejoonlee.movmag.app.movie.service.MovieExternalApiClient;
-import com.jejoonlee.movmag.app.movie.service.impl.MovieExternalApiClientImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 public class AppConfig {
@@ -15,7 +15,11 @@ public class AppConfig {
     }
 
     @Bean
-    public MovieExternalApiClient movieExternalApiClient() {
-        return new MovieExternalApiClientImpl();
+    public WebClient tmdbApiWebClient() {
+        return WebClient.builder()
+                .baseUrl("https://api.themoviedb.org/3")
+                .defaultHeader(HttpHeaders.ACCEPT, "application/json")
+                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(-1))
+                .build();
     }
 }

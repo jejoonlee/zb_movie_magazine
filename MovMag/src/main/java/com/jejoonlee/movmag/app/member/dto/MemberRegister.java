@@ -1,6 +1,7 @@
 package com.jejoonlee.movmag.app.member.dto;
 
 import com.jejoonlee.movmag.app.member.domain.MemberEntity;
+import com.jejoonlee.movmag.app.member.domain.MemberRole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,7 +21,8 @@ public class MemberRegister {
     public static class Request {
 
         @NotBlank(message="이메일은 필수 입력 사항입니다")
-        @Email(message="이메일 형식에 맞지 않습니다")
+        @Email(message="이메일 형식에 맞지 않습니다",
+        regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,6}$")
         private String email;
 
         @NotBlank(message="회원 이름은 필수 입력 사항입니다")
@@ -36,20 +38,27 @@ public class MemberRegister {
                 message = "010-0000-0000 형식으로 입력해주세요")
         private String phoneNum;
 
-        @NotBlank(message="Editor 또는 User를 입력해주세요")
-        @Pattern(regexp = "Editor|User", message = "Editor 또는 User를 입력해주세요")
+        @NotBlank(message="EDITOR 또는 USER 입력해주세요")
+        @Pattern(regexp = "EDITOR|USER", message = "EDITOR 또는 USER를 입력해주세요")
         private String role;
 
         public MemberEntity toEntity() {
-            return MemberEntity.builder()
+
+            MemberEntity memberEntity = MemberEntity.builder()
                     .email(this.email)
                     .username(this.username)
                     .password(this.password)
                     .phoneNum(this.phoneNum)
-                    .role(this.role)
+                    .role(MemberRole.USER)
                     .registeredAt(LocalDateTime.now())
                     .updatedAt(LocalDateTime.now())
                     .build();
+
+            if (this.role.equals("USER")) {
+                memberEntity.setRole(MemberRole.EDITOR);
+            }
+
+            return memberEntity;
         }
     }
 
@@ -60,7 +69,7 @@ public class MemberRegister {
     public static class Response {
         private String email;
         private String username;
-        private String role;
+        private MemberRole role;
 
         public static Response fromDto(MemberDto memberDto){
             return Response.builder()

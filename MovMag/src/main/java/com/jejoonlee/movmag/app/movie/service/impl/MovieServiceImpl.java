@@ -19,10 +19,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -202,11 +200,9 @@ public class MovieServiceImpl implements MovieService {
 
             Long castId = castInfo.getId();
 
-            boolean savedCast = castRepository.existsById(castId);
-
             CastDto castDto;
 
-            if (!savedCast) {
+            if (!castRepository.existsById(castId)) {
                 JSONArray movieArray = new JSONArray();
 
                 movieArray.add(movieId);
@@ -236,14 +232,16 @@ public class MovieServiceImpl implements MovieService {
 
                 ArrayList<Integer> movieIdList = (ArrayList<Integer>) movieIdMap.get("movieId");
 
-                movieIdList.add(Math.toIntExact(movieId));
+                movieIdList.add(movieId.intValue());
 
-                movieIdList.stream().distinct();
+                List<Long> movieIdResult = movieIdList.stream()
+                        .map(id -> Long.valueOf(id))
+                        .distinct()
+                        .collect(Collectors.toList());
 
-                movieIdMap.put("movieId", movieIdList);
+                movieIdMap.put("movieId", movieIdResult);
 
                 castDto.setMovieId(movieIdMap);
-
             }
 
             castRepository.save(CastDto.toEntity(castDto));
@@ -315,7 +313,7 @@ public class MovieServiceImpl implements MovieService {
         saveGenre(genreListEng, genreListKor);
         log.info("Save Genre finish : {}", LocalDateTime.now());
 
-        int[] counts = saveMovies(apiKey, 99, 500);
+        int[] counts = saveMovies(apiKey, 1, 500);
 
         return UpdateMovie.Response.builder()
                 .message("DB에 저장된 영화와 캐스트. 이미 저장이 되어 있는 데이터일 수도 있습니다 (0이 나올시).")

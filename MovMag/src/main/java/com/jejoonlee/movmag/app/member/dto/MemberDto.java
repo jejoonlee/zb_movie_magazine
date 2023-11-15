@@ -1,6 +1,7 @@
 package com.jejoonlee.movmag.app.member.dto;
 
 import com.jejoonlee.movmag.app.member.domain.MemberEntity;
+import com.jejoonlee.movmag.app.member.domain.MemberRole;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -23,7 +24,7 @@ public class MemberDto implements UserDetails {
     private String username;
     private String password;
     private String phoneNum;
-    private String role;
+    private MemberRole role;
     private LocalDateTime registeredAt;
     private LocalDateTime updatedAt;
 
@@ -40,15 +41,28 @@ public class MemberDto implements UserDetails {
                 .build();
     }
 
+    public static MemberEntity toEntity(MemberDto memberDto) {
+        return MemberEntity.builder()
+                .memberId(memberDto.getMemberId())
+                .email(memberDto.getEmail())
+                .username(memberDto.getUsername())
+                .password(memberDto.getPassword())
+                .phoneNum(memberDto.getPhoneNum())
+                .role(memberDto.getRole())
+                .registeredAt(memberDto.getRegisteredAt())
+                .updatedAt(memberDto.getUpdatedAt())
+                .build();
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> auth = new ArrayList<>();
 
-        if (this.role.equals("Editor")) {
+        if (this.role == MemberRole.EDITOR) {
             auth.add(new SimpleGrantedAuthority("ROLE_EDITOR"));
-        } else if (this.role.equals("User")) {
+        } else if (this.role == MemberRole.USER) {
             auth.add(new SimpleGrantedAuthority("ROLE_USER"));
-        } else if (this.role.equals("Admin")) {
+        } else if (this.role == MemberRole.ADMIN) {
             auth.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
         } else {
             throw new RuntimeException("없는 권한입니다");

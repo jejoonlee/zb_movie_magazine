@@ -1,5 +1,6 @@
 package com.jejoonlee.movmag.app.member.security;
 
+import com.jejoonlee.movmag.app.member.domain.MemberRole;
 import com.jejoonlee.movmag.app.member.service.impl.MemberServiceImpl;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -21,16 +22,16 @@ public class TokenProvider {
 
     private final MemberServiceImpl memberServiceImpl;
     private static final String KEY_ROLES = "role";
-    private static final String EMAIL = "email";
+    private static final String MEMBER_ID = "memberId";
     private static final long VALIDATE_TIME = 1 * 60 * 60 * 1000L; // 1시간
 
     @Value("${spring.jwt.secret.key}")
     private String secretKey;
 
     // 토큰 생성 매서드
-    public String generateToken(Long memberId, String email, String role) {
-        Claims claims = Jwts.claims().setSubject(String.valueOf(memberId));
-        claims.put(EMAIL, email);
+    public String generateToken(Long memberId, String email, MemberRole role) {
+        Claims claims = Jwts.claims().setSubject(email);
+        claims.put(MEMBER_ID, memberId);
         claims.put(KEY_ROLES, role); // key value로 저장
 
         Date now = new Date();
@@ -45,11 +46,11 @@ public class TokenProvider {
     }
 
     public Authentication getAuthentication(String jwt) {
-        UserDetails userDetails = memberServiceImpl.loadUserByUsername(getMemberId(jwt));
+        UserDetails userDetails = memberServiceImpl.loadUserByUsername(getMemberEmail(jwt));
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
-    public String getMemberId(String token) {
+    public String getMemberEmail(String token) {
         return this.parseClaims(token).getSubject();
     }
 
