@@ -24,6 +24,9 @@ public enum ErrorCode {
     // 영화 업데이트 에러 코드
     MOVIE_NOT_FOUND("영화를 찾을 수 없습니다", 4),
     CAST_NOT_FOUND("캐스트를 찾을 수 없습니다", 4),
+    PAGE_NOT_FOUND("찾는 페이지를 찾을 수 없습니다", 4),
+    WRONG_LANGUAGE("korean 또는 english으로만 영화를 검색할 수 있습니다", 4),
+    NO_MOVIE_FOUND("영화를 찾을 수 없습니다", 4),
 
     TMDB_SUCCESS("TMDB 관련 요청이 정상적으로 작동 되었습니다", 2),
     TMDB_INVALID_SERVICE("해당 서비스는 유효하지 않습니다", 5),
@@ -75,7 +78,10 @@ public enum ErrorCode {
     REVIEW_NOT_FOUND("리뷰를 찾을 수 없습니다", 4),
     LOGGED_IN_USER_AND_AUTHOR_UNMATCH("리뷰를 쓴 사람과, 로그인한 유저가 다릅니다", 4),
     SAVE_TO_ELASTICSEARCH_UNSUCCESSFUL("엘라스틱서치에 저장하는 것을 실패했습니다", 5),
-    ELASTICSEARCH_CAN_NOT_FIND_REVIEW("엘라스틱서치에서 리뷰를 찾을 수 없습니다", 4);
+    ELASTICSEARCH_CAN_NOT_FIND_REVIEW("엘라스틱서치에서 리뷰를 찾을 수 없습니다", 4),
+
+    COMMENT_NOT_FOUND("해당 댓글을 찾을 수 없습니다", 4),
+    LOGGED_IN_USER_AND_COMMENT_USER_NOT_MATCH("댓글을 작성한 사람과 로그인한 사람이 일치하지 않습니다", 6);
 
     private String description;
 
