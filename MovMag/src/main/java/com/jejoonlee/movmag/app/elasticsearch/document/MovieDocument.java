@@ -5,6 +5,8 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.*;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,8 +39,8 @@ public class MovieDocument {
     @Field(name="overview_kor", type = FieldType.Text)
     private String overviewKor;
 
-    @Field(name="released_date", type = FieldType.Text)
-    private String releasedDate;
+    @Field(name="released_date", type = FieldType.Date)
+    private LocalDate releasedDate;
 
     @Field(name="movie_score", type = FieldType.Double)
     private Double movieScore;
@@ -50,6 +52,19 @@ public class MovieDocument {
     private String posterPath;
 
     public static MovieDocument fromEntity(MovieEntity movieEntity) {
+
+        // 영화 개봉 날짜가 없을 때 사용 (영화 역사상 첫 영화 개봉 날짜)
+        String firstEverMovieReleased = "1895-12-28";
+
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate releasedDate;
+
+        if (!movieEntity.getReleasedDate().equals("")) {
+            releasedDate = LocalDate.parse(movieEntity.getReleasedDate(), dtf);
+        } else {
+            releasedDate = LocalDate.parse(firstEverMovieReleased, dtf);
+        }
+
         return MovieDocument.builder()
                 .movieId(movieEntity.getMovieId())
                 .genreId(movieEntity.getGenreId())
@@ -57,7 +72,7 @@ public class MovieDocument {
                 .titleKor(movieEntity.getTitleKor())
                 .overviewEng(movieEntity.getOverviewEng())
                 .overviewKor(movieEntity.getOverviewKor())
-                .releasedDate(movieEntity.getReleasedDate())
+                .releasedDate(releasedDate)
                 .movieScore(movieEntity.getMovieScore())
                 .runtime(movieEntity.getRuntime())
                 .posterPath(movieEntity.getPosterPath())

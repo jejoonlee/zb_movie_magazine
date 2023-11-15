@@ -1,14 +1,14 @@
 package com.jejoonlee.movmag.app.elasticsearch.repository;
 
 import com.jejoonlee.movmag.app.elasticsearch.document.MovieDocument;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
-
-import java.util.List;
 
 public interface MovieSearchRepository extends ElasticsearchRepository<MovieDocument, Long> {
 
-    List<MovieDocument> findAllByTitleEng(String movieTitle);
+    Page<MovieDocument> findAllByTitleEngOrderByReleasedDateDesc(String movieTitle, Pageable pageable);
 
-    List<MovieDocument> findAllByTitleKor(String movieTitle);
+    Page<MovieDocument> findAllByTitleKorOrderByReleasedDateDesc(String movieTitle, Pageable pageable);
 
 }

@@ -77,7 +77,6 @@ public enum ErrorCode {
     SAVE_TO_ELASTICSEARCH_UNSUCCESSFUL("엘라스틱서치에 저장하는 것을 실패했습니다", 5),
     ELASTICSEARCH_CAN_NOT_FIND_REVIEW("엘라스틱서치에서 리뷰를 찾을 수 없습니다", 4);
 
-
     private String description;
 
     // 2 success

@@ -1,7 +1,7 @@
 package com.jejoonlee.movmag.app.movie.controller;
 
-import com.jejoonlee.movmag.app.elasticsearch.document.CastDocument;
-import com.jejoonlee.movmag.app.elasticsearch.document.MovieDocument;
+import com.jejoonlee.movmag.app.elasticsearch.dto.CastElsDto;
+import com.jejoonlee.movmag.app.elasticsearch.dto.MovieElsDto;
 import com.jejoonlee.movmag.app.elasticsearch.service.CastSearchService;
 import com.jejoonlee.movmag.app.elasticsearch.service.MovieSearchService;
 import com.jejoonlee.movmag.app.movie.dto.UpdateMovie;
@@ -11,8 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.json.simple.parser.ParseException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -60,17 +58,19 @@ public class MovieController {
 
     // all
     @GetMapping("")
-    public ResponseEntity<List<MovieDocument>> searchMovie(
+    public ResponseEntity<MovieElsDto.PageInfo> searchMovie(
             @RequestParam String movieName,
-            @RequestParam String lang
+            @RequestParam String lang,
+            @RequestParam int page
     ) {
-        return ResponseEntity.ok(movieSearchService.searchMovie(movieName, lang));
+        return ResponseEntity.ok(movieSearchService.searchMovie(movieName, lang, page));
     }
 
     @GetMapping("/cast")
-    public ResponseEntity<List<CastDocument>> searchMovieByCast(
-            @RequestParam String name
+    public ResponseEntity<CastElsDto.Page> searchMovieByCast(
+            @RequestParam String name,
+            @RequestParam int page
     ){
-        return ResponseEntity.ok(castSearchService.searchByCast(name));
+        return ResponseEntity.ok(castSearchService.searchByCast(name, page));
     }
 }

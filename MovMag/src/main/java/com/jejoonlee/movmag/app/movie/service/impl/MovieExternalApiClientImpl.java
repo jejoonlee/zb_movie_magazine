@@ -1,6 +1,7 @@
 package com.jejoonlee.movmag.app.movie.service.impl;
 
 import com.jejoonlee.movmag.app.movie.dto.MovieExternalApiDto;
+import com.jejoonlee.movmag.app.movie.service.MovieExternalApiClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -10,7 +11,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class MovieExternalApiClient {
+public class MovieExternalApiClientImpl implements MovieExternalApiClient {
 
     private final WebClient webClient;
 
