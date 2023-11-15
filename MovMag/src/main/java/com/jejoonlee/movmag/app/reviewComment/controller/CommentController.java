@@ -1,7 +1,9 @@
 package com.jejoonlee.movmag.app.reviewComment.controller;
 
 import com.jejoonlee.movmag.app.reviewComment.dto.CommentDelete;
+import com.jejoonlee.movmag.app.reviewComment.dto.CommentDetail;
 import com.jejoonlee.movmag.app.reviewComment.dto.CommentRegister;
+import com.jejoonlee.movmag.app.reviewComment.dto.CommentUpdate;
 import com.jejoonlee.movmag.app.reviewComment.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,6 +33,15 @@ public class CommentController {
     // 리뷰 댓글 수정
     // http://localhost:8080/review/comment/update
     // commentId, 리뷰ID, authentication
+    @PutMapping("/update")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_EDITOR', 'ROLE_USER')")
+    public CommentUpdate.Response createComment(
+            @RequestBody CommentUpdate.Request request,
+            Authentication authentication
+    ) {
+        return commentService.updateComment(request, authentication);
+    }
+
 
     // 리뷰 댓글 삭제
     // http://localhost:8080/review/comment/delete
@@ -46,5 +57,14 @@ public class CommentController {
     }
 
     // 리뷰 댓글 확인
+    // http://localhost:8080/review/comment
+    @GetMapping("")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_EDITOR', 'ROLE_USER')")
+    public CommentDetail.PageInfo getComment(
+            @RequestParam int page,
+            Authentication authentication
+    ) {
+        return commentService.getComment(page, authentication);
+    }
 
 }
