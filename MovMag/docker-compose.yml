@@ -32,6 +32,13 @@ services:
     networks:
       - es-bridge
 
+  redis:
+    image: redis
+    container_name: movmag_redis
+    ports:
+      - 6379:6379
+    restart: always
+
 networks:
   es-bridge:
     driver: bridge
