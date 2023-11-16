@@ -24,6 +24,9 @@ public enum ErrorCode {
     // 영화 업데이트 에러 코드
     MOVIE_NOT_FOUND("영화를 찾을 수 없습니다", 4),
     CAST_NOT_FOUND("캐스트를 찾을 수 없습니다", 4),
+    PAGE_NOT_FOUND("찾는 페이지를 찾을 수 없습니다", 4),
+    WRONG_LANGUAGE("korean 또는 english으로만 영화를 검색할 수 있습니다", 4),
+    NO_MOVIE_FOUND("영화를 찾을 수 없습니다", 4),
 
     TMDB_SUCCESS("TMDB 관련 요청이 정상적으로 작동 되었습니다", 2),
     TMDB_INVALID_SERVICE("해당 서비스는 유효하지 않습니다", 5),

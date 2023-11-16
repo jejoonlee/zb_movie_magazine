@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.parser.ParseException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -26,6 +27,7 @@ public class MovieController {
     // 처음에 영화 가지고 오기 (500개, 한번만)
     // only admin (업데이트까지 다 완성되면 권한 넣기)
     @PostMapping("/first-time")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public UpdateMovie.Response saveAllMovie (
             @RequestBody UpdateMovie.Request request
     ) throws ParseException, InterruptedException {
@@ -37,6 +39,7 @@ public class MovieController {
     // 2달 안 최신 영화 가지고 오기 (영화 업데이트 할때마다)
     // only admin
     @PostMapping("/newUpdate")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public UpdateMovie.Response updateMovie (
             @RequestBody UpdateMovie.Request request
     ) throws ParseException, InterruptedException {
@@ -46,12 +49,14 @@ public class MovieController {
 
     // only admin
     @PostMapping("/save_movie_document")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Long saveMovieDocument(){
         return movieSearchService.saveAllMoviesToMovieDocument();
     }
 
     // only admin
     @PostMapping("/save_cast_document")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Long saveCastDocument(){
         return castSearchService.saveAllCastsToCastDocument();
     }

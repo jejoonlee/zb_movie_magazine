@@ -1,5 +1,7 @@
 package com.jejoonlee.movmag.app.review.controller;
 
+import com.jejoonlee.movmag.app.elasticsearch.dto.ReviewElsDto;
+import com.jejoonlee.movmag.app.elasticsearch.service.ReviewSearchService;
 import com.jejoonlee.movmag.app.review.dto.*;
 import com.jejoonlee.movmag.app.review.service.ReviewService;
 import lombok.RequiredArgsConstructor;
@@ -16,8 +18,7 @@ import java.util.List;
 public class ReviewController {
 
     private final ReviewService reviewService;
-
-
+    private final ReviewSearchService reviewSearchService;
 
     // 리뷰 작성
     // http://localhost:8080/review/create
@@ -63,8 +64,6 @@ public class ReviewController {
         return reviewService.deleteReview(reviewId, authentication);
     }
 
-    // ================================== 새로 추가 ==================================
-
     // 리뷰 좋아요 or 취소
     // http://localhost:8080/review/like/{review_id}/{user_id}
     @GetMapping("/like")
@@ -86,13 +85,21 @@ public class ReviewController {
 
 
     // 리뷰 찾기, 리뷰를 쓴 유저 (elasticsearch)
-    // http://localhost:8080/review?user={keyword}
+    // http://localhost:8080/review/search?author={keyword}&page={page}
+    @GetMapping("/search")
+    public ReviewElsDto.PageInfo searchReviewByAuthor(
+            @RequestParam String author,
+            @RequestParam int page
+    ) {
+        return reviewSearchService.searchReviewByAuthor(author, page);
+    }
 
     // 리뷰 제목 (elasticsearch)
     // http://localhost:8080/review?reviewName={review_name}
 
     // 영화  (elasticsearch)
-    // http://localhost:8080/review?movieName={movie_name}
+    // http://localhost:8080/review?movieName={movie_name}&lang={언어}
+    // 언어는 korean 또는 english
 
 
 }
