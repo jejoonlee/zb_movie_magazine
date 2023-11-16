@@ -59,7 +59,7 @@ public class ReviewSearchServiceImpl implements ReviewSearchService {
     // ============ 검색 ===============
 
     private ReviewElsDto.PageInfo getSearchResult(Page<ReviewDocument> reviewDocumentPage, int page) {
-        if (page <= 0 && page > reviewDocumentPage.getTotalPages())
+        if (page < 0 && page > reviewDocumentPage.getTotalPages())
             throw new ReviewClientException(ErrorCode.PAGE_NOT_FOUND);
 
         List<ReviewElsDto.Response> reviewResults = reviewDocumentPage.getContent()
@@ -78,7 +78,7 @@ public class ReviewSearchServiceImpl implements ReviewSearchService {
     private ReviewElsDto.PageInfo getReviewListByAuthor(String author, int page) {
 
         Page<ReviewDocument> reviewDocumentPage = reviewSearchRepository
-                .findAllByAuthorOrderByUpdatedAtDesc(author, PageRequest.of(page - 1, 20));
+                .findAllByAuthorOrderByUpdatedAtDesc(author, PageRequest.of(page, 20));
 
         return getSearchResult(reviewDocumentPage, page);
     }
@@ -90,7 +90,7 @@ public class ReviewSearchServiceImpl implements ReviewSearchService {
 
     private ReviewElsDto.PageInfo getReviewListByReviewTitle(String reviewTitle, int page) {
         Page<ReviewDocument> reviewDocumentPage = reviewSearchRepository
-                .findAllByReviewTitleOrderByUpdatedAtDesc(reviewTitle, PageRequest.of(page - 1, 20));
+                .findAllByReviewTitleOrderByUpdatedAtDesc(reviewTitle, PageRequest.of(page, 20));
 
         return getSearchResult(reviewDocumentPage, page);
     }
@@ -107,10 +107,10 @@ public class ReviewSearchServiceImpl implements ReviewSearchService {
 
         if (lang.equals("korean")) {
             reviewDocumentPage = reviewSearchRepository
-                    .findAllByMovieTitleKorOrderByUpdatedAtDesc(movieTitle, PageRequest.of(page - 1, 20));
+                    .findAllByMovieTitleKorOrderByUpdatedAtDesc(movieTitle, PageRequest.of(page, 20));
         } else if (lang.equals("english")) {
             reviewDocumentPage = reviewSearchRepository
-                    .findAllByMovieTitleEngOrderByUpdatedAtDesc(movieTitle, PageRequest.of(page - 1, 20));
+                    .findAllByMovieTitleEngOrderByUpdatedAtDesc(movieTitle, PageRequest.of(page, 20));
         } else {
             throw new ReviewClientException(ErrorCode.WRONG_LANGUAGE);
         }
