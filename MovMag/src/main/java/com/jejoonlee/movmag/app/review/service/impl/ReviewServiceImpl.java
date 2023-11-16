@@ -75,18 +75,6 @@ public class ReviewServiceImpl implements ReviewService {
         return review;
     }
 
-    private void deleteCommentAndLikes(ReviewEntity reviewEntity) {
-
-        List<CommentEntity> tempComments = commentRepository.findAllByReviewEntity(reviewEntity);
-
-        List<LikeEntity> tempLikes = reviewLikeRepository.findAllByReviewEntity(reviewEntity);
-
-        commentRepository.deleteAll(tempComments);
-
-        reviewLikeRepository.deleteAll(tempLikes);
-
-    }
-
     @Override
     public ReviewRegister.Response createReview(ReviewRegister.Request request, Authentication authentication) {
 
@@ -169,9 +157,6 @@ public class ReviewServiceImpl implements ReviewService {
         // 입력한 리뷰ID가 유효한지 확인 +
         // 로그인한 사람이 현재 리뷰를 수정할 수 있는 권한이 있는지 확인
         ReviewEntity reviewEntity = checkAvailabilityToChangeReview(member, reviewId);
-
-        // Review를 삭제하기 전에 리뷰의 댓글과 좋아요를 모두 삭제해야 한다
-        deleteCommentAndLikes(reviewEntity);
 
         // 엘라스틱 서치에서 먼저 삭제를 하기
         reviewSearchService.deleteFromReviewDocument(ReviewDetail.fromEntity(reviewEntity));

@@ -29,7 +29,7 @@ public class CommentServiceImpl implements CommentService {
 
     private final ReviewRepository reviewRepository;
 
-    private boolean authorizedUser(MemberDto memberDto, CommentEntity commentEntity) {
+    private void authorizedUser(MemberDto memberDto, CommentEntity commentEntity) {
 
         MemberRole loggedInMemRole = memberDto.getRole();
         Long loggedInMemId = memberDto.getMemberId();
@@ -37,13 +37,7 @@ public class CommentServiceImpl implements CommentService {
         Long commentMemId = commentEntity.getMemberEntity().getMemberId();
 
         // 어드민, 또는 댓글을 쓴 사람과, 로그인한 사람이 일치하면 같으면 수정 또는 삭제를 할 수 있음
-        if (loggedInMemRole == MemberRole.ADMIN) {
-            return true;
-
-        } else if (loggedInMemId == commentMemId) {
-            return true;
-
-        } else {
+        if (loggedInMemRole != MemberRole.ADMIN && loggedInMemId != commentMemId) {
             throw new CommentException(ErrorCode.LOGGED_IN_USER_AND_COMMENT_USER_NOT_MATCH);
         }
     }
