@@ -15,6 +15,8 @@ import com.jejoonlee.movmag.app.review.repository.response.MovieScore;
 import com.jejoonlee.movmag.app.review.repository.response.PopularReview;
 import com.jejoonlee.movmag.app.review.service.ReviewService;
 import com.jejoonlee.movmag.app.review.type.LikeOrCancel;
+import com.jejoonlee.movmag.app.reviewComment.domain.CommentEntity;
+import com.jejoonlee.movmag.app.reviewComment.repository.CommentRepository;
 import com.jejoonlee.movmag.exception.ErrorCode;
 import com.jejoonlee.movmag.exception.MovieException;
 import com.jejoonlee.movmag.exception.ReviewClientException;
@@ -35,6 +37,7 @@ public class ReviewServiceImpl implements ReviewService {
     private final MovieRepository movieRepository;
     private final ReviewRepository reviewRepository;
     private final ReviewLikeRepository reviewLikeRepository;
+    private final CommentRepository commentRepository;
     private final ReviewSearchService reviewSearchService;
 
 
@@ -70,6 +73,18 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         return review;
+    }
+
+    private void deleteCommentAndLikes(ReviewEntity reviewEntity) {
+
+        List<CommentEntity> tempComments = commentRepository.findAllByReviewEntity(reviewEntity);
+
+        List<LikeEntity> tempLikes = reviewLikeRepository.findAllByReviewEntity(reviewEntity);
+
+        commentRepository.deleteAll(tempComments);
+
+        reviewLikeRepository.deleteAll(tempLikes);
+
     }
 
     @Override
@@ -155,6 +170,9 @@ public class ReviewServiceImpl implements ReviewService {
         // 로그인한 사람이 현재 리뷰를 수정할 수 있는 권한이 있는지 확인
         ReviewEntity reviewEntity = checkAvailabilityToChangeReview(member, reviewId);
 
+        // Review를 삭제하기 전에 리뷰의 댓글과 좋아요를 모두 삭제해야 한다
+        deleteCommentAndLikes(reviewEntity);
+
         // 엘라스틱 서치에서 먼저 삭제를 하기
         reviewSearchService.deleteFromReviewDocument(ReviewDetail.fromEntity(reviewEntity));
 
@@ -166,8 +184,6 @@ public class ReviewServiceImpl implements ReviewService {
                 .message("정상적으로 삭제를 했습니다")
                 .build();
     }
-
-    // ================================== 새로 추가 ==================================
 
     private LikeOrCancel likeOrCancelLike(ReviewEntity reviewEntity, MemberEntity memberEntity) {
 
