@@ -58,11 +58,7 @@ public class ReviewSearchServiceImpl implements ReviewSearchService {
 
     // ============ 검색 ===============
 
-    private ReviewElsDto.PageInfo getReviewListByAuthor(String author, int page) {
-
-        Page<ReviewDocument> reviewDocumentPage = reviewSearchRepository
-                .findAllByAuthorOrderByUpdatedAtDesc(author, PageRequest.of(page - 1, 20));
-
+    private ReviewElsDto.PageInfo getSearchResult(Page<ReviewDocument> reviewDocumentPage, int page) {
         if (page <= 0 && page > reviewDocumentPage.getTotalPages())
             throw new ReviewClientException(ErrorCode.PAGE_NOT_FOUND);
 
@@ -79,18 +75,51 @@ public class ReviewSearchServiceImpl implements ReviewSearchService {
                 .build();
     }
 
+    private ReviewElsDto.PageInfo getReviewListByAuthor(String author, int page) {
+
+        Page<ReviewDocument> reviewDocumentPage = reviewSearchRepository
+                .findAllByAuthorOrderByUpdatedAtDesc(author, PageRequest.of(page - 1, 20));
+
+        return getSearchResult(reviewDocumentPage, page);
+    }
+
     @Override
     public ReviewElsDto.PageInfo searchReviewByAuthor(String author, int page) {
         return getReviewListByAuthor(author, page);
     }
 
+    private ReviewElsDto.PageInfo getReviewListByReviewTitle(String reviewTitle, int page) {
+        Page<ReviewDocument> reviewDocumentPage = reviewSearchRepository
+                .findAllByReviewTitleOrderByUpdatedAtDesc(reviewTitle, PageRequest.of(page - 1, 20));
+
+        return getSearchResult(reviewDocumentPage, page);
+    }
+
     @Override
     public ReviewElsDto.PageInfo searchReviewByReviewTitle(String reviewTitle, int page) {
-        return null;
+        return getReviewListByReviewTitle(reviewTitle, page);
+    }
+
+    private ReviewElsDto.PageInfo getReviewListByMovieTitle(String movieTitle, String lang, int page) {
+        lang = lang.toLowerCase();
+
+        Page<ReviewDocument> reviewDocumentPage;
+
+        if (lang.equals("korean")) {
+            reviewDocumentPage = reviewSearchRepository
+                    .findAllByMovieTitleKorOrderByUpdatedAtDesc(movieTitle, PageRequest.of(page - 1, 20));
+        } else if (lang.equals("english")) {
+            reviewDocumentPage = reviewSearchRepository
+                    .findAllByMovieTitleEngOrderByUpdatedAtDesc(movieTitle, PageRequest.of(page - 1, 20));
+        } else {
+            throw new ReviewClientException(ErrorCode.WRONG_LANGUAGE);
+        }
+
+        return getSearchResult(reviewDocumentPage, page);
     }
 
     @Override
     public ReviewElsDto.PageInfo searchReviewByMovieTitle(String movieTitle, String lang, int page) {
-        return null;
+        return getReviewListByMovieTitle(movieTitle, lang, page);
     }
 }
