@@ -54,7 +54,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(CommentException.class)
-    public ResponseEntity<ErrorResponse> handleCommentException(ReviewClientException e) {
+    public ResponseEntity<ErrorResponse> handleCommentException(CommentException e) {
         log.error("{} has occurred.", e.getErrorCode());
 
         return ResponseEntity.status(getHttpStatus(e.getErrorNum())).body(

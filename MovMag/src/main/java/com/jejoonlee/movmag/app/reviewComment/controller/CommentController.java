@@ -5,6 +5,8 @@ import com.jejoonlee.movmag.app.reviewComment.dto.CommentDetail;
 import com.jejoonlee.movmag.app.reviewComment.dto.CommentRegister;
 import com.jejoonlee.movmag.app.reviewComment.dto.CommentUpdate;
 import com.jejoonlee.movmag.app.reviewComment.service.CommentService;
+import com.jejoonlee.movmag.exception.ErrorCode;
+import com.jejoonlee.movmag.exception.MemberException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -44,7 +46,7 @@ public class CommentController {
 
 
     // 리뷰 댓글 삭제
-    // http://localhost:8080/review/comment/delete
+    // http://localhost:8080/review/comment/delete?reviewId={}&commentId={}
     // commentId, 리뷰ID, authentication
     @DeleteMapping("/delete")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_EDITOR', 'ROLE_USER')")
@@ -53,17 +55,20 @@ public class CommentController {
             @RequestParam Long commentId,
             Authentication authentication
     ) {
-        return commentService.deleteComment(commentId, reviewId, authentication);
+        return commentService.deleteComment(reviewId, commentId, authentication);
     }
 
     // 리뷰 댓글 확인
-    // http://localhost:8080/review/comment
+    // http://localhost:8080/review/comment?page={pageNum}
     @GetMapping("")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_EDITOR', 'ROLE_USER')")
     public CommentDetail.PageInfo getComment(
             @RequestParam int page,
             Authentication authentication
     ) {
+        if (!authentication.isAuthenticated())
+            throw new MemberException(ErrorCode.USER_PERMISSION_NOT_GRANTED);
+
         return commentService.getComment(page, authentication);
     }
 
