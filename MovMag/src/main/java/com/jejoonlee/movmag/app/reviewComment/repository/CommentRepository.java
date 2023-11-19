@@ -15,4 +15,6 @@ public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
     Page<CommentEntity> findAllByMemberEntityOrderByUpdatedAtDesc(MemberEntity member, Pageable pageable);
 
     List<CommentEntity> findAllByReviewEntity(ReviewEntity reviewEntity);
+
+    void deleteAllByReviewEntity(ReviewEntity reviewEntity);
 }

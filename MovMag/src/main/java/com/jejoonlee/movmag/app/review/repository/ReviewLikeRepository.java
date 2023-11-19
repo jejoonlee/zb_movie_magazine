@@ -17,4 +17,6 @@ public interface ReviewLikeRepository extends JpaRepository<LikeEntity, Long> {
 
     List<LikeEntity> findAllByReviewEntity(ReviewEntity reviewEntity);
 
+    void deleteAllByReviewEntity(ReviewEntity reviewEntity);
+
 }
