@@ -9,7 +9,27 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class TokenDto {
-    private String accessToken;
-    private String tokenType;
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class Response {
+        private String tokenType;
+        private TokenInfo tokenInfo;
+    }
+
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class TokenInfo {
+        private String accessToken;
+        private String refreshToken;
+    }
+
 
 }

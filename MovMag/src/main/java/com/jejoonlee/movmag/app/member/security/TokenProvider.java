@@ -1,6 +1,8 @@
 package com.jejoonlee.movmag.app.member.security;
 
+import com.jejoonlee.movmag.app.member.dto.TokenDto;
 import com.jejoonlee.movmag.app.member.service.impl.MemberServiceImpl;
+import com.jejoonlee.movmag.redis.RedisDao;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -13,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import java.time.Duration;
 import java.util.Date;
 
 @Component
@@ -20,21 +23,40 @@ import java.util.Date;
 public class TokenProvider {
 
     private final MemberServiceImpl memberServiceImpl;
+    private final RedisDao redisDao;
     private static final String KEY_ROLES = "role";
     private static final String EMAIL = "email";
-    private static final long VALIDATE_TIME = 1 * 60 * 60 * 1000L; // 1시간
+    private static final long ACCESS_TOKEN_VALIDATE_TIME = 1 * 60 * 60 * 1000L; // 1시간
+
+    private static final long REFRESH_TOKEN_VALIDATE_TIME =  7 * 24 * 60 * 60 * 1000L; // 1주일
 
     @Value("${spring.jwt.secret.key}")
     private String secretKey;
 
-    // 토큰 생성 매서드
-    public String generateToken(Long memberId, String email, String role) {
+    public TokenDto.TokenInfo loginGenerateTokens(Long memberId, String email, String role) {
+
+        String accessToken = generateToken(memberId, email, role, ACCESS_TOKEN_VALIDATE_TIME);
+        String refreshToken = generateToken(memberId, email, role, REFRESH_TOKEN_VALIDATE_TIME);
+
+        // redis에 저장
+        redisDao.setValues(String.valueOf(memberId),
+                refreshToken,
+                Duration.ofMillis(REFRESH_TOKEN_VALIDATE_TIME));
+
+        return TokenDto.TokenInfo.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+    }
+
+    // Access 토큰 생성 매서드
+    public String generateToken(Long memberId, String email, String role, long time) {
         Claims claims = Jwts.claims().setSubject(String.valueOf(memberId));
         claims.put(EMAIL, email);
         claims.put(KEY_ROLES, role); // key value로 저장
 
         Date now = new Date();
-        Date expiredDate = new Date(now.getTime() + VALIDATE_TIME);
+        Date expiredDate = new Date(now.getTime() + time);
 
         return Jwts.builder()
                 .setClaims(claims)

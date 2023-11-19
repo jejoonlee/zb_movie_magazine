@@ -33,18 +33,19 @@ public class MemberController {
 
     // http://localhost:8080/member/login
     @PostMapping("/login")
-    public TokenDto login(
+    public TokenDto.Response login(
             @RequestBody  @Valid MemberLogin.Request request
     ) {
 
         MemberLogin.Response loginInfo = memberService.login(request);
 
-        TokenDto token = TokenDto.builder()
-                .accessToken(tokenProvider.generateToken(
+        TokenDto.Response token = TokenDto.Response.builder()
+                .tokenType("Bearer")
+                .tokenInfo(tokenProvider.loginGenerateTokens(
                         loginInfo.getMemberId(),
                         loginInfo.getEmail(),
-                        loginInfo.getRole()))
-                .tokenType("Bearer")
+                        loginInfo.getRole()
+                ))
                 .build();
 
         return token;

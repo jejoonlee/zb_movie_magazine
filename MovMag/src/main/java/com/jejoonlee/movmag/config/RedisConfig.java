@@ -23,7 +23,7 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisTemplate<String, String> redisTemplate() {
+    public RedisTemplate<String, String> redisStringTemplate() {
         // redisTemplate을 받아와서 set, get, delete을 사용
         RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
         // setKeySerializer, setValueSerializer 설정
