@@ -53,6 +53,14 @@ public class GlobalExceptionHandler {
                 ErrorResponse.getErrorCode(e.getErrorCode()));
     }
 
+    @ExceptionHandler(CommentException.class)
+    public ResponseEntity<ErrorResponse> handleCommentException(CommentException e) {
+        log.error("{} has occurred.", e.getErrorCode());
+
+        return ResponseEntity.status(getHttpStatus(e.getErrorNum())).body(
+                ErrorResponse.getErrorCode(e.getErrorCode()));
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         log.error("MethodArgumentNotValidException : " + e.getMessage());
