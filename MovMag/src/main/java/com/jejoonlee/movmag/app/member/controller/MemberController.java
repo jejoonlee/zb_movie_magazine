@@ -5,6 +5,7 @@ import com.jejoonlee.movmag.app.member.dto.MemberRegister;
 import com.jejoonlee.movmag.app.member.dto.TokenDto;
 import com.jejoonlee.movmag.app.member.security.TokenProvider;
 import com.jejoonlee.movmag.app.member.service.MemberService;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,6 +25,7 @@ public class MemberController {
 
     // http://localhost:8080/member/register
     @PostMapping("/register")
+    @ApiOperation(value="회원가입")
     public MemberRegister.Response register(
             @RequestBody @Valid MemberRegister.Request request
     ) {
@@ -33,6 +35,7 @@ public class MemberController {
 
     // http://localhost:8080/member/login
     @PostMapping("/login")
+    @ApiOperation(value="로그인")
     public TokenDto login(
             @RequestBody  @Valid MemberLogin.Request request
     ) {

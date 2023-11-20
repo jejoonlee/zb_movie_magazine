@@ -7,6 +7,7 @@ import com.jejoonlee.movmag.app.reviewComment.dto.CommentUpdate;
 import com.jejoonlee.movmag.app.reviewComment.service.CommentService;
 import com.jejoonlee.movmag.exception.ErrorCode;
 import com.jejoonlee.movmag.exception.MemberException;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -25,6 +26,7 @@ public class CommentController {
     // http://localhost:8080/review/comment/register
     @PostMapping("/register")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_EDITOR', 'ROLE_USER')")
+    @ApiOperation(value="댓글을 작성한다. 로그인을 해야 한다")
     public CommentRegister.Response createComment(
             @RequestBody @Valid CommentRegister.Request request,
             Authentication authentication
@@ -37,6 +39,7 @@ public class CommentController {
     // commentId, 리뷰ID, authentication
     @PutMapping("/update")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_EDITOR', 'ROLE_USER')")
+    @ApiOperation(value="댓글을 수정한다. Admin은 댓글이 부적절하다고 생각하면, 모든 댓글을 수정할 수 있다")
     public CommentUpdate.Response createComment(
             @RequestBody CommentUpdate.Request request,
             Authentication authentication
@@ -50,6 +53,7 @@ public class CommentController {
     // commentId, 리뷰ID, authentication
     @DeleteMapping("/delete")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_EDITOR', 'ROLE_USER')")
+    @ApiOperation(value="댓글을 삭제한다. Admin은 댓글이 부적절하다고 생각하면, 댓글을 삭제할 수 있다")
     public CommentDelete.Response createComment(
             @RequestParam Long reviewId,
             @RequestParam Long commentId,
@@ -62,6 +66,7 @@ public class CommentController {
     // http://localhost:8080/review/comment?page={pageNum}
     @GetMapping("")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_EDITOR', 'ROLE_USER')")
+    @ApiOperation(value="내가 쓴 모든 댓글을 볼 수 있다")
     public CommentDetail.PageInfo getComment(
             @RequestParam int page,
             Authentication authentication

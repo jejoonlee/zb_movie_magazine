@@ -6,6 +6,7 @@ import com.jejoonlee.movmag.app.elasticsearch.service.CastSearchService;
 import com.jejoonlee.movmag.app.elasticsearch.service.MovieSearchService;
 import com.jejoonlee.movmag.app.movie.dto.UpdateMovie;
 import com.jejoonlee.movmag.app.movie.service.MovieService;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.parser.ParseException;
@@ -28,6 +29,7 @@ public class MovieController {
     // only admin (업데이트까지 다 완성되면 권한 넣기)
     @PostMapping("/first-time")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @ApiOperation(value="TMDB API에서 영화 저장. Admin만만 이용 가능")
     public UpdateMovie.Response saveAllMovie (
             @RequestBody UpdateMovie.Request request
     ) throws ParseException, InterruptedException {
@@ -40,6 +42,7 @@ public class MovieController {
     // only admin
     @PostMapping("/newUpdate")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @ApiOperation(value="TMDB API에서 최신 영화 업데이트. Admin만 이용 가능")
     public UpdateMovie.Response updateMovie (
             @RequestBody UpdateMovie.Request request
     ) throws ParseException, InterruptedException {
@@ -50,6 +53,7 @@ public class MovieController {
     // only admin
     @PostMapping("/save_movie_document")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @ApiOperation(value="저장된 모든 영화 정보를 Elasticsearch에 저장. Admin만 이용 가능")
     public Long saveMovieDocument(){
         return movieSearchService.saveAllMoviesToMovieDocument();
     }
@@ -57,12 +61,14 @@ public class MovieController {
     // only admin
     @PostMapping("/save_cast_document")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @ApiOperation(value="캐스트 정보를 Elasticsearch에 저장. Admin만 가능")
     public Long saveCastDocument(){
         return castSearchService.saveAllCastsToCastDocument();
     }
 
     // all
     @GetMapping("")
+    @ApiOperation(value="영화 이름을 검색하여 영화 찾기")
     public ResponseEntity<MovieElsDto.PageInfo> searchMovie(
             @RequestParam String movieName,
             @RequestParam String lang,
@@ -72,6 +78,7 @@ public class MovieController {
     }
 
     @GetMapping("/cast")
+    @ApiOperation(value="캐스트를 검색하여, 캐스트가 나온 영화 찾기")
     public ResponseEntity<CastElsDto.Page> searchMovieByCast(
             @RequestParam String name,
             @RequestParam int page
