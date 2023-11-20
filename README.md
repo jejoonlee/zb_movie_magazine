@@ -60,9 +60,7 @@
 - MySQL
 - Spring Security
 - Swagger
-- ElasticSearch (예정)
-- WebSocket (예정)
-- OAuth (예정)
+- ElasticSearch
 
 
 
@@ -96,7 +94,6 @@
 
 - **POST 회원가입**
   - 회원가입을 할 때에 EDITOR 또는 USER 권한을 정한다
-  - *추후에 간편 로그인 추가 (gmail? kakao? naver?)* 
 - **POST 로그인**
   - 해당 어플리케이션은 로그인을 리뷰를 볼 수 있다
 
