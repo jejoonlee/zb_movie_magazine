@@ -24,7 +24,7 @@ public enum ErrorCode {
     // 영화 업데이트 에러 코드
     MOVIE_NOT_FOUND("영화를 찾을 수 없습니다", 4),
     CAST_NOT_FOUND("캐스트를 찾을 수 없습니다", 4),
-    PAGE_NOT_FOUND("찾는 페이지를 찾을 수 없습니다", 4),
+    PAGE_NOT_FOUND("찾는 페이지를 찾을 수 없습니다 (페이지는 0부터 시작합니다)", 4),
     WRONG_LANGUAGE("korean 또는 english으로만 영화를 검색할 수 있습니다", 4),
     NO_MOVIE_FOUND("영화를 찾을 수 없습니다", 4),
 

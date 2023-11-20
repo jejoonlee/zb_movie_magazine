@@ -52,7 +52,7 @@ public class CastSearchServiceImpl implements CastSearchService {
     private CastElsDto.Page getMovieByCast(String name, int page) {
 
         Page<CastDocument> castDocumentPage =
-                castSearchRepository.findAllByNameEng(name, PageRequest.of(page - 1, 10));
+                castSearchRepository.findAllByNameEng(name, PageRequest.of(page, 10));
 
         List<CastElsDto.Response> result = new ArrayList<>();
 

@@ -52,10 +52,10 @@ public class MovieSearchServiceImpl implements MovieSearchService {
         // 입력한 페이지에 대한 영화 데이터 가지고 오기
         if (lang.equals("korean")) {
             movieDocumentPage =  movieSearchRepository
-                    .findAllByTitleKorOrderByReleasedDateDesc(movieName, PageRequest.of(page - 1, 10));
+                    .findAllByTitleKorOrderByReleasedDateDesc(movieName, PageRequest.of(page, 10));
         } else if (lang.equals("english")) {
             movieDocumentPage = movieSearchRepository
-                    .findAllByTitleEngOrderByReleasedDateDesc(movieName, PageRequest.of(page - 1, 10));
+                    .findAllByTitleEngOrderByReleasedDateDesc(movieName, PageRequest.of(page, 10));
         } else {
             throw new MovieException(ErrorCode.WRONG_LANGUAGE);
         }
