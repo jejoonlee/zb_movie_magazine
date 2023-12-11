@@ -17,6 +17,8 @@ bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
 
+MovMag/src/main/resources/application-secret.properties
+
 ### IntelliJ IDEA ###
 .idea
 *.iws
