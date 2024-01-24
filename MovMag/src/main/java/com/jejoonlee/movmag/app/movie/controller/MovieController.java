@@ -11,8 +11,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.parser.ParseException;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
@@ -24,11 +28,11 @@ public class MovieController {
     private final MovieSearchService movieSearchService;
     private final CastSearchService castSearchService;
 
-    // http://localhost:8080/movie/firstTime
+    // http://localhost:8080/movie/save
     // 처음에 영화 가지고 오기 (500개, 한번만)
     // only admin (업데이트까지 다 완성되면 권한 넣기)
-    @PostMapping("/first-time")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PostMapping("/save")
+//    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @ApiOperation(value="TMDB API에서 영화 저장. Admin만만 이용 가능")
     public UpdateMovie.Response saveAllMovie (
             @RequestBody UpdateMovie.Request request
@@ -40,8 +44,8 @@ public class MovieController {
 
     // 2달 안 최신 영화 가지고 오기 (영화 업데이트 할때마다)
     // only admin
-    @PostMapping("/newUpdate")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PostMapping("/update")
+//    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @ApiOperation(value="TMDB API에서 최신 영화 업데이트. Admin만 이용 가능")
     public UpdateMovie.Response updateMovie (
             @RequestBody UpdateMovie.Request request
@@ -51,16 +55,16 @@ public class MovieController {
     }
 
     // only admin
-    @PostMapping("/save_movie_document")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PostMapping("/document/save-movie")
+//    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @ApiOperation(value="저장된 모든 영화 정보를 Elasticsearch에 저장. Admin만 이용 가능")
     public Long saveMovieDocument(){
         return movieSearchService.saveAllMoviesToMovieDocument();
     }
 
     // only admin
-    @PostMapping("/save_cast_document")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PostMapping("/document/save-cast")
+//    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @ApiOperation(value="캐스트 정보를 Elasticsearch에 저장. Admin만 가능")
     public Long saveCastDocument(){
         return castSearchService.saveAllCastsToCastDocument();

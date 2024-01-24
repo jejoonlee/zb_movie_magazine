@@ -70,7 +70,7 @@ public class ReviewController {
     }
 
     // 리뷰 좋아요 or 취소
-    // http://localhost:8080/review/like/{review_id}/{user_id}
+    // http://localhost:8080/review/like/{review_id}
     @GetMapping("/like")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_EDITOR', 'ROLE_USER')")
     @ApiOperation(value="리뷰 좋아요를 누르거나, 좋아요 취소를 할 수 있다. 로그인을 해야 한다")
@@ -92,8 +92,8 @@ public class ReviewController {
 
 
     // 리뷰 찾기, 리뷰를 쓴 유저 (elasticsearch)
-    // http://localhost:8080/review/search_by_author?author={keyword}&page={page}
-    @GetMapping("/search_by_author")
+    // http://localhost:8080/review/search/author?author={keyword}&page={page}
+    @GetMapping("/search/author")
     @ApiOperation(value="리뷰를 작성한 사람의 이름을 기반으로 리뷰를 찾는다")
     public ReviewElsDto.PageInfo searchReviewByAuthor(
             @RequestParam String author,
@@ -103,8 +103,8 @@ public class ReviewController {
     }
 
     // 리뷰 제목 (elasticsearch)
-    // http://localhost:8080/review/search_by_review?reviewTitle={review_name}&page={페이지}
-    @GetMapping("/search_by_review")
+    // http://localhost:8080/review/search/review?reviewTitle={review_name}&page={페이지}
+    @GetMapping("/search/review")
     @ApiOperation(value="리뷰의 제목을 기반으로 검색하여 리뷰를 찾는 기능이다")
     public ReviewElsDto.PageInfo searchReviewByReviewTitle(
             @RequestParam String reviewTitle,
@@ -114,9 +114,9 @@ public class ReviewController {
     }
 
     // 영화  (elasticsearch)
-    // http://localhost:8080/review/search_by_movie?movieTitle={movie_name}&language={언어}&page={페이지}
+    // http://localhost:8080/review/search/movie?movieTitle={movie_name}&language={언어}&page={페이지}
     // 언어는 korean 또는 english
-    @GetMapping("/search_by_movie")
+    @GetMapping("/search/movie")
     @ApiOperation(value="영화의 제목을 기반으로 검색하여 리뷰를 찾는 기능이다")
     public ReviewElsDto.PageInfo searchReviewByMovieTitle(
             @RequestParam String language,
