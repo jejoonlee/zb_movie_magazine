@@ -74,11 +74,11 @@ public class MovieController {
     @GetMapping("")
     @ApiOperation(value="영화 이름을 검색하여 영화 찾기")
     public ResponseEntity<MovieElsDto.PageInfo> searchMovie(
-            @RequestParam String movieName,
+            @RequestParam String title,
             @RequestParam String lang,
             @RequestParam int page
     ) {
-        return ResponseEntity.ok(movieSearchService.searchMovie(movieName, lang, page));
+        return ResponseEntity.ok(movieSearchService.searchMovie(title, lang, page));
     }
 
     @GetMapping("/cast")

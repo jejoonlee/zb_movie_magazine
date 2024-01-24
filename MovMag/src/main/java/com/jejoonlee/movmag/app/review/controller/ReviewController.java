@@ -96,10 +96,10 @@ public class ReviewController {
     @GetMapping("/search/author")
     @ApiOperation(value="리뷰를 작성한 사람의 이름을 기반으로 리뷰를 찾는다")
     public ReviewElsDto.PageInfo searchReviewByAuthor(
-            @RequestParam String author,
+            @RequestParam String name,
             @RequestParam int page
     ) {
-        return reviewSearchService.searchReviewByAuthor(author, page);
+        return reviewSearchService.searchReviewByAuthor(name, page);
     }
 
     // 리뷰 제목 (elasticsearch)
@@ -107,10 +107,10 @@ public class ReviewController {
     @GetMapping("/search/review")
     @ApiOperation(value="리뷰의 제목을 기반으로 검색하여 리뷰를 찾는 기능이다")
     public ReviewElsDto.PageInfo searchReviewByReviewTitle(
-            @RequestParam String reviewTitle,
+            @RequestParam String title,
             @RequestParam int page
     ) {
-        return reviewSearchService.searchReviewByReviewTitle(reviewTitle, page);
+        return reviewSearchService.searchReviewByReviewTitle(title, page);
     }
 
     // 영화  (elasticsearch)
@@ -120,10 +120,10 @@ public class ReviewController {
     @ApiOperation(value="영화의 제목을 기반으로 검색하여 리뷰를 찾는 기능이다")
     public ReviewElsDto.PageInfo searchReviewByMovieTitle(
             @RequestParam String language,
-            @RequestParam String movieTitle,
+            @RequestParam String title,
             @RequestParam int page
     ) {
-        return reviewSearchService.searchReviewByMovieTitle(movieTitle, language, page);
+        return reviewSearchService.searchReviewByMovieTitle(title, language, page);
     }
 
 }
