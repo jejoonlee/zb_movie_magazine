@@ -139,8 +139,6 @@
 
 #### 리뷰 댓글
 
-> Websocket을 사용해서 댓글이 달리면 리뷰를 쓴 EDITOR가 알람을 받을 수 있도록 한다
-
 - **POST 작성** (ADMIN, EDITOR, USER)
 - **GET 해당 리뷰에 대한 댓글 일기** (ADMIN, EDITOR, USER)
   - 시간 순으로 내림차순으로 (최신이 제일 위에)
