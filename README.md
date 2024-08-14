@@ -49,7 +49,11 @@
 - 미리 영화들을 DB에 저장을 할 예정 (DB는 MySQL)
 
 
+## User Flow
+![image](https://github.com/user-attachments/assets/b3dfec0d-8b13-4ca0-ba41-cf9cae5a853a)
 
+## Software Architecture C4 Model (Level 3)
+![image](https://github.com/user-attachments/assets/7f2b962e-bcae-400c-b8a7-efc9158943e8)
 
 
 ## 사용 기술
